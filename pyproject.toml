@@ -51,6 +51,9 @@ dev = [
     "python-semantic-release>=9.0.0",
 ]
 
+[project.scripts]
+wizerd = "wizerd.cli:app"
+
 [tool.setuptools.package-data]
 "wizerd" = ["py.typed"]
 "wizerd.templates.config" = ["*.yaml"]
