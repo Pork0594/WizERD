@@ -10,8 +10,92 @@ permissions:
   id-token: write
 
 jobs:
+  test:
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - name: Create venv and install dependencies
+        run: |
+          uv venv .venv --seed
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m pip install -e ".[dev]"
+
+      - name: Install Node dependencies
+        run: |
+          cd wizerd/layout && npm ci
+
+      - name: Run tests
+        run: |
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m pytest -v
+
+      - name: Run linter
+        run: |
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m ruff check .
+
+      - name: Run type check
+        run: |
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m mypy wizerd
+
+  lint-only:
+    name: Lint only (Python 3.11)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - name: Install linters and package
+        run: uv pip install --system ruff mypy -e .
+
+      - name: Install Node dependencies
+        run: |
+          cd wizerd/layout && npm ci
+
+      - name: Run linter
+        run: ruff check .
+
+      - name: Run type check
+        run: mypy wizerd
+
   build-binaries:
     name: Build binary (${{ matrix.target }})
+    needs: [lint-only, test]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -96,7 +180,7 @@ jobs:
 
   release:
     name: Semantic Release
-    needs: [build-binaries]
+    needs: [lint-only, test, build-binaries]
     runs-on: ubuntu-latest
     permissions:
       contents: write
