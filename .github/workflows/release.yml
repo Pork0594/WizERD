@@ -62,11 +62,10 @@ jobs:
         shell: bash
         run: |
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            cd dist/wizerd
-            zip -r ../wizerd-${{ matrix.target }}.zip .
+            cd dist
+            zip -r wizerd-${{ matrix.target }}.zip wizerd
           else
-            cd dist/wizerd
-            tar -czvf ../wizerd-${{ matrix.target }}.tar.gz .
+            tar -czvf dist/wizerd-${{ matrix.target }}.tar.gz -C dist wizerd
           fi
 
       - name: Upload binary
