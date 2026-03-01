@@ -58,15 +58,17 @@ jobs:
         env:
           WIZERD_BUNDLE_NODE: "1"
 
-      - name: Create archive
+      - name: Create archive (Unix)
+        if: matrix.os != 'windows-latest'
         shell: bash
         run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            cd dist
-            zip -r wizerd-${{ matrix.target }}.zip wizerd
-          else
-            tar -czvf dist/wizerd-${{ matrix.target }}.tar.gz -C dist wizerd
-          fi
+          tar -czvf dist/wizerd-${{ matrix.target }}.tar.gz -C dist wizerd
+
+      - name: Create archive (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist\wizerd -DestinationPath dist\wizerd-${{ matrix.target }}.zip
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
