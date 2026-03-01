@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+from importlib import metadata as importlib_metadata
 from pathlib import Path
 
 import typer
@@ -26,6 +27,45 @@ LOGO = r"""
     ░░███ ░░███      █████  █████████ ██████████ █████   █████ ██████████
      ░░░   ░░░      ░░░░░  ░░░░░░░░░ ░░░░░░░░░░ ░░░░░   ░░░░░ ░░░░░░░░░░
 """
+
+
+def _resolve_version() -> str:
+    """Return the installed WizERD version or best-effort fallback."""
+
+    package_name = "wizerd"
+    try:
+        return importlib_metadata.version(package_name)
+    except importlib_metadata.PackageNotFoundError:
+        fallback = _read_version_from_pyproject()
+        return fallback or "unknown"
+
+
+def _read_version_from_pyproject() -> str | None:
+    """Read the project version from a local pyproject.toml if available."""
+
+    pyproject_path = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    try:
+        contents = pyproject_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    in_project_section = False
+    for raw_line in contents.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            in_project_section = line == "[project]"
+            continue
+        if in_project_section and line.startswith("version"):
+            _, _, value = line.partition("=")
+            version_candidate = value.strip().strip('"').strip("'")
+            if version_candidate:
+                return version_candidate
+    return None
+
+
+VERSION = _resolve_version()
 
 
 def _print_logo() -> None:
@@ -156,9 +196,22 @@ INIT_FORCE_OPTION = typer.Option(
 )
 
 
-@app.callback(no_args_is_help=True)
-def _bootstrap(ctx: typer.Context) -> None:
+@app.callback(no_args_is_help=True, invoke_without_command=True)
+def _bootstrap(
+    ctx: typer.Context,
+    version: bool = typer.Option(
+        False,
+        "--version",
+        "-v",
+        help="Show WizERD version",
+        is_eager=True,
+    ),
+) -> None:
     """Initialize logging before dispatching to command handlers."""
+
+    if version:
+        typer.echo(f"WizERD v{VERSION}")
+        raise typer.Exit()
 
     _configure_logging()
 
