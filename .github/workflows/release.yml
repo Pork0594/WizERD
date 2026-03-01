@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-binaries:
-    name: Build binary (${{ matrix.os }})
+    name: Build binary (${{ matrix.target }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -19,8 +19,6 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux-x64
-          - os: ubuntu-latest
-            target: linux-arm64
           - os: macos-latest
             target: macos-x64
           - os: macos-latest
@@ -44,6 +42,7 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
 
       - name: Create venv and install dependencies
         run: |
@@ -60,13 +59,14 @@ jobs:
           WIZERD_BUNDLE_NODE: "1"
 
       - name: Create archive
+        shell: bash
         run: |
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             cd dist/wizerd
             zip -r ../wizerd-${{ matrix.target }}.zip .
           else
             cd dist/wizerd
-            tar -czvf ../../wizerd-${{ matrix.target }}.tar.gz .
+            tar -czvf ../wizerd-${{ matrix.target }}.tar.gz .
           fi
 
       - name: Upload binary
@@ -99,17 +99,23 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
 
       - name: Install semantic-release
         run: uv pip install --system python-semantic-release
 
       - name: Run semantic-release
+        id: semrel
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: semantic-release publish
+        run: |
+          semantic-release publish
+          NEW_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "")
+          echo "tag=${NEW_TAG}" >> $GITHUB_OUTPUT
 
       - name: Download all binaries
+        if: steps.semrel.outputs.tag != ''
         uses: actions/download-artifact@v4
         with:
           pattern: binary-*
@@ -117,12 +123,10 @@ jobs:
           merge-multiple: true
 
       - name: Attach binaries to release
+        if: steps.semrel.outputs.tag != ''
         run: |
-          TAG=$(git describe --tags --abbrev=0)
-          if [ -n "$TAG" ]; then
-            for f in binaries/*; do
-              gh release upload "$TAG" "$f" --clobber
-            done
-          fi
+          for f in binaries/*; do
+            gh release upload "${{ steps.semrel.outputs.tag }}" "$f" --clobber
+          done
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

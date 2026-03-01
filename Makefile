@@ -39,7 +39,7 @@ venv:
 install: venv
 	. .venv/bin/activate && pip install -e ".[dev]"
 
-node-install:Yes
+node-install:
 	cd wizerd/layout && npm ci
 
 install-all: venv node-install install
