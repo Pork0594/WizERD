@@ -211,9 +211,12 @@ class ConfigLoader:
             env_config["input_path"] = input_env
 
         spacing_keys = {
-            f"{prefix}SPACING_LINE_GAP": "line_gap",
-            f"{prefix}SPACING_LINE_TABLE_GAP": "line_table_gap",
-            f"{prefix}SPACING_ENTRY_ZONE_GAP": "entry_zone_gap",
+            f"{prefix}SPACING_COLUMN_GAP": "column_gap",
+            f"{prefix}SPACING_ROW_GAP": "row_gap",
+            f"{prefix}SPACING_COMPONENT_GAP": "component_gap",
+            f"{prefix}SPACING_EDGE_TO_NODE_GAP": "edge_to_node_gap",
+            f"{prefix}SPACING_EDGE_GAP": "edge_gap",
+            f"{prefix}SPACING_MARGIN": "margin",
         }
         spacing_values: dict[str, float] = {}
         for env_var, spacing_key in spacing_keys.items():
@@ -261,9 +264,12 @@ class ConfigLoader:
             base,
             spacing_profile=SpacingProfile(
                 name=base.spacing_profile.name,
-                line_gap=base.spacing_profile.line_gap,
-                line_table_gap=base.spacing_profile.line_table_gap,
-                entry_zone_gap=base.spacing_profile.entry_zone_gap,
+                column_gap=base.spacing_profile.column_gap,
+                row_gap=base.spacing_profile.row_gap,
+                component_gap=base.spacing_profile.component_gap,
+                edge_to_node_gap=base.spacing_profile.edge_to_node_gap,
+                edge_gap=base.spacing_profile.edge_gap,
+                margin=base.spacing_profile.margin,
             ),
             theme_overrides=config.ThemeOverrides(
                 colors=dict(base.theme_overrides.colors),
@@ -274,9 +280,12 @@ class ConfigLoader:
             theme_inline=dict(base.theme_inline) if base.theme_inline else None,
             custom_spacing=(
                 config.CustomSpacing(
-                    line_gap=base.custom_spacing.line_gap,
-                    line_table_gap=base.custom_spacing.line_table_gap,
-                    entry_zone_gap=base.custom_spacing.entry_zone_gap,
+                    column_gap=base.custom_spacing.column_gap,
+                    row_gap=base.custom_spacing.row_gap,
+                    component_gap=base.custom_spacing.component_gap,
+                    edge_to_node_gap=base.custom_spacing.edge_to_node_gap,
+                    edge_gap=base.custom_spacing.edge_gap,
+                    margin=base.custom_spacing.margin,
                 )
                 if base.custom_spacing
                 else None
@@ -326,15 +335,24 @@ class ConfigLoader:
                     result.theme_name = str(value)
                     result.theme_inline = None
             elif norm_key == "spacing" and isinstance(value, dict):
+                incoming = config.CustomSpacing.from_mapping(value)
+                if not incoming.to_dict():
+                    continue
+
                 if result.custom_spacing is None:
                     result.custom_spacing = config.CustomSpacing()
 
-                if "line_gap" in value:
-                    result.custom_spacing.line_gap = value["line_gap"]
-                if "line_table_gap" in value:
-                    result.custom_spacing.line_table_gap = value["line_table_gap"]
-                if "entry_zone_gap" in value:
-                    result.custom_spacing.entry_zone_gap = value["entry_zone_gap"]
+                for field_name in (
+                    "column_gap",
+                    "row_gap",
+                    "component_gap",
+                    "edge_to_node_gap",
+                    "edge_gap",
+                    "margin",
+                ):
+                    override_value = getattr(incoming, field_name)
+                    if override_value is not None:
+                        setattr(result.custom_spacing, field_name, override_value)
 
                 base_profile = SpacingProfile.from_name(result.spacing_profile.name)
                 result.spacing_profile = config.AppConfig._apply_custom_spacing(

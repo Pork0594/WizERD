@@ -71,6 +71,17 @@ All CLI options map to environment variables:
 | `--color-by-trunk` | `WIZERD_COLOR_BY_TRUNK` |
 | `--config` | `WIZERD_CONFIG` |
 
+Spacing environment variables for fine-grained control:
+
+| Env Var | Config Key |
+|---------|------------|
+| `WIZERD_SPACING_COLUMN_GAP` | `spacing.column_gap` |
+| `WIZERD_SPACING_ROW_GAP` | `spacing.row_gap` |
+| `WIZERD_SPACING_COMPONENT_GAP` | `spacing.component_gap` |
+| `WIZERD_SPACING_EDGE_TO_NODE_GAP` | `spacing.edge_to_node_gap` |
+| `WIZERD_SPACING_EDGE_GAP` | `spacing.edge_gap` |
+| `WIZERD_SPACING_MARGIN` | `spacing.margin` |
+
 ### Example
 
 ```bash
@@ -90,6 +101,31 @@ wizerd generate schema.sql
 | `show-edge-labels` | boolean | `false` | Show FK names on connectors |
 | `spacing-profile` | string | `compact, standard, spacious` | Spacing preset |
 | `color-by-trunk` | boolean | `false` | Color edges by FK target |
+
+### Custom Spacing Keys (advanced)
+
+If you need finer control than the `spacing-profile` presets provide, you can set `spacing` in your config file. These keys map directly to the ELK layout knobs and control horizontal/vertical gaps, component separation, and canvas margins.
+
+| Key | Type | Default (standard) | Description |
+|-----|------|--------------------:|-------------|
+| `column_gap` | number | `360.0` | Horizontal gap between table columns (controls X-axis spacing) |
+| `row_gap` | number | `225.0` | Vertical gap between tables within a column (controls Y-axis spacing) |
+| `component_gap` | number | `570.0` | Gap between disconnected groups of tables |
+| `edge_to_node_gap` | number | `51.0` | Clearance between edges and table boxes |
+| `edge_gap` | number | `39.0` | Clearance between parallel edges (lane spacing) |
+| `margin` | number | `72.0` | Canvas margin applied on both axes |
+
+Example (YAML):
+
+```yaml
+# .wizerd.yaml
+spacing:
+  column_gap: 200.0
+  edge_gap: 18.0
+  margin: 32.0
+```
+
+Use the canonical keys above when setting `spacing` in your config file or via environment variables. Legacy keys are not supported.
 
 ## Validating Configuration
 

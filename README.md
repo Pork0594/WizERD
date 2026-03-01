@@ -82,6 +82,14 @@ cd wizerd/layout && npm ci
 wizerd generate schema.sql -o diagram.svg
 ```
 
+Check the currently installed WizERD version:
+
+```bash
+wizerd --version
+# or
+python -m wizerd --version
+```
+
 ### Themes
 
 ```bash

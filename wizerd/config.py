@@ -44,9 +44,53 @@ class ThemeOverrides:
 class CustomSpacing:
     """Custom spacing values that override the profile."""
 
-    line_gap: float | None = None
-    line_table_gap: float | None = None
-    entry_zone_gap: float | None = None
+    column_gap: float | None = None
+    row_gap: float | None = None
+    component_gap: float | None = None
+    edge_to_node_gap: float | None = None
+    edge_gap: float | None = None
+    margin: float | None = None
+
+    @classmethod
+    def from_mapping(cls, data: dict[str, Any]) -> "CustomSpacing":
+        """Build a CustomSpacing object from a mapping using the canonical keys.
+
+        Accepts keys with hyphens or underscores but does not support legacy names.
+        """
+        kwargs: dict[str, float] = {}
+        allowed = {
+            "column_gap",
+            "row_gap",
+            "component_gap",
+            "edge_to_node_gap",
+            "edge_gap",
+            "margin",
+        }
+        for raw_key, value in data.items():
+            if value is None:
+                continue
+            key = raw_key.replace("-", "_")
+            if key not in allowed:
+                continue
+            kwargs[key] = float(value)
+        return cls(**kwargs)
+
+    def to_dict(self) -> dict[str, float]:
+        """Serialize only the spacing values that were explicitly set."""
+        result: dict[str, float] = {}
+        if self.column_gap is not None:
+            result["column_gap"] = self.column_gap
+        if self.row_gap is not None:
+            result["row_gap"] = self.row_gap
+        if self.component_gap is not None:
+            result["component_gap"] = self.component_gap
+        if self.edge_to_node_gap is not None:
+            result["edge_to_node_gap"] = self.edge_to_node_gap
+        if self.edge_gap is not None:
+            result["edge_gap"] = self.edge_gap
+        if self.margin is not None:
+            result["margin"] = self.margin
+        return result
 
 
 @dataclass
@@ -90,11 +134,9 @@ class AppConfig:
         if self.theme_inline is not None:
             result["theme_inline"] = self.theme_inline
         if self.custom_spacing:
-            result["spacing"] = {
-                "line_gap": self.custom_spacing.line_gap,
-                "line_table_gap": self.custom_spacing.line_table_gap,
-                "entry_zone_gap": self.custom_spacing.entry_zone_gap,
-            }
+            spacing_payload = self.custom_spacing.to_dict()
+            if spacing_payload:
+                result["spacing"] = spacing_payload
 
         overrides_dict = self.theme_overrides.to_dict()
         if overrides_dict:
@@ -108,11 +150,7 @@ class AppConfig:
 
         if "spacing" in data:
             spacing_data = data["spacing"]
-            custom_spacing = CustomSpacing(
-                line_gap=spacing_data.get("line_gap"),
-                line_table_gap=spacing_data.get("line_table_gap"),
-                entry_zone_gap=spacing_data.get("entry_zone_gap"),
-            )
+            custom_spacing = CustomSpacing.from_mapping(spacing_data)
             spacing_profile = cls._apply_custom_spacing(spacing_profile, custom_spacing)
         else:
             custom_spacing = None
@@ -143,13 +181,18 @@ class AppConfig:
         """Apply custom spacing values to a profile."""
         return SpacingProfile(
             name=profile.name,
-            line_gap=custom.line_gap if custom.line_gap is not None else profile.line_gap,
-            line_table_gap=custom.line_table_gap
-            if custom.line_table_gap is not None
-            else profile.line_table_gap,
-            entry_zone_gap=custom.entry_zone_gap
-            if custom.entry_zone_gap is not None
-            else profile.entry_zone_gap,
+            column_gap=custom.column_gap if custom.column_gap is not None else profile.column_gap,
+            row_gap=custom.row_gap if custom.row_gap is not None else profile.row_gap,
+            component_gap=(
+                custom.component_gap if custom.component_gap is not None else profile.component_gap
+            ),
+            edge_to_node_gap=(
+                custom.edge_to_node_gap
+                if custom.edge_to_node_gap is not None
+                else profile.edge_to_node_gap
+            ),
+            edge_gap=custom.edge_gap if custom.edge_gap is not None else profile.edge_gap,
+            margin=custom.margin if custom.margin is not None else profile.margin,
         )
 
 

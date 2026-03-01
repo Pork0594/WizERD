@@ -9,9 +9,10 @@ def test_spacing_profile_from_name_returns_expected_values():
     profile = SpacingProfile.from_name("compact")
 
     assert profile.name == "compact"
-    assert profile.line_gap == 16.0
-    assert profile.line_table_gap == 24.0
-    assert profile.entry_zone_gap == 32.0
+    assert profile.column_gap == 180.0
+    assert profile.row_gap == 110.0
+    assert profile.edge_gap == 18.0
+    assert profile.margin == 36.0
 
 
 def test_spacing_profile_unknown_name_raises():
@@ -29,9 +30,9 @@ def test_elk_layout_config_reflects_spacing_profile():
     profile = SpacingProfile.from_name("standard")
     config = ElkLayoutConfig.from_spacing_profile(profile)
 
-    assert config.spacing_layer >= 200.0
-    assert config.spacing_node_node >= 80.0
-    assert config.spacing_edge_edge == profile.line_gap
+    assert config.spacing_layer == profile.column_gap
+    assert config.spacing_node_node == profile.row_gap
+    assert config.spacing_edge_edge == profile.edge_gap
 
 
 def test_spacing_profiles_have_distinct_values():
@@ -40,6 +41,6 @@ def test_spacing_profiles_have_distinct_values():
     standard = SpacingProfile.from_name("standard")
     spacious = SpacingProfile.from_name("spacious")
 
-    assert compact.line_gap < standard.line_gap < spacious.line_gap
-    assert compact.line_table_gap < standard.line_table_gap < spacious.line_table_gap
-    assert compact.entry_zone_gap < standard.entry_zone_gap < spacious.entry_zone_gap
+    assert compact.column_gap < standard.column_gap < spacious.column_gap
+    assert compact.row_gap < standard.row_gap < spacious.row_gap
+    assert compact.margin < standard.margin < spacious.margin

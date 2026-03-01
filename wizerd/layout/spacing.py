@@ -3,77 +3,76 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import ClassVar, Dict
 
 
 @dataclass
 class SpacingProfile:
-    """User-facing spacing configuration for ELK layout.
-
-    Attributes:
-        name: Profile identifier (compact, standard, spacious)
-        line_gap: Minimum gap between parallel edge segments
-        line_table_gap: Minimum gap between edges and tables
-        entry_zone_gap: Gap between table and incoming edge bends
-    """
+    """User-facing spacing configuration for the layout engine."""
 
     name: str
-    line_gap: float
-    line_table_gap: float
-    entry_zone_gap: float
+    column_gap: float
+    row_gap: float
+    component_gap: float
+    edge_to_node_gap: float
+    edge_gap: float
+    margin: float
+
+    _PRESETS: ClassVar[Dict[str, Dict[str, float]]] = {
+        "compact": {
+            "column_gap": 180.0,
+            "row_gap": 110.0,
+            "component_gap": 260.0,
+            "edge_to_node_gap": 26.0,
+            "edge_gap": 18.0,
+            "margin": 36.0,
+        },
+        "standard": {
+            # Significantly larger than compact to provide much more breathing room
+            "column_gap": 360.0,
+            "row_gap": 225.0,
+            "component_gap": 570.0,
+            "edge_to_node_gap": 51.0,
+            "edge_gap": 39.0,
+            "margin": 72.0,
+        },
+        "spacious": {
+            # Much larger spacing for very large schemas and review purposes
+            "column_gap": 720.0,
+            "row_gap": 450.0,
+            "component_gap": 1140.0,
+            "edge_to_node_gap": 102.0,
+            "edge_gap": 78.0,
+            "margin": 144.0,
+        },
+    }
 
     @classmethod
     def default(cls) -> "SpacingProfile":
         """Return the profile that matches production defaults."""
-        return cls(
-            name="standard",
-            line_gap=40.0,
-            line_table_gap=36.0,
-            entry_zone_gap=40.0,
-        )
+        return cls.from_name("standard")
 
     @classmethod
     def from_name(cls, name: str) -> "SpacingProfile":
         """Look up a named preset, raising if the user requested an unknown one."""
         key = (name or "standard").strip().lower()
-        profiles = {
-            "compact": cls(
-                name="compact",
-                line_gap=16.0,
-                line_table_gap=24.0,
-                entry_zone_gap=32.0,
-            ),
-            "standard": cls.default(),
-            "spacious": cls(
-                name="spacious",
-                line_gap=64.0,
-                line_table_gap=48.0,
-                entry_zone_gap=64.0,
-            ),
-        }
-        if key not in profiles:
+        preset = cls._PRESETS.get(key)
+        if preset is None:
             raise ValueError(
-                f"Unknown spacing profile '{name}'. Expected one of: {', '.join(profiles.keys())}."
+                f"Unknown spacing profile '{name}'. Expected one of: {', '.join(sorted(cls._PRESETS))}."
             )
-        return profiles[key]
+        return cls(name=key, **preset)
 
     def derived(self) -> "SpacingDerived":
         """Convert user-facing spacing to ELK configuration values."""
-        horizontal_margin = max(56.0, self.line_table_gap + 20.0)
-
         return SpacingDerived(
-            horizontal_margin=horizontal_margin,
-            vertical_margin=horizontal_margin,
-            spacing_layer=max(
-                350.0, self.entry_zone_gap * 6.0
-            ),  # Distance between columns of tables horizontally (X-axis spacing)
-            spacing_component=max(
-                500.0, self.line_table_gap * 12.0
-            ),  # Distance between unconnected components (groups of tables)
-            spacing_node_node=max(150.0, self.line_table_gap * 4.0),  # Distance between two nodes
-            spacing_edge_node=max(
-                60.0, self.line_table_gap * 2.0
-            ),  # Distance between an edge and a node
-            spacing_edge_edge=max(20.0, self.line_gap),  # Distance between two edges
+            horizontal_margin=self.margin,
+            vertical_margin=self.margin,
+            spacing_layer=self.column_gap,
+            spacing_component=self.component_gap,
+            spacing_node_node=self.row_gap,
+            spacing_edge_node=self.edge_to_node_gap,
+            spacing_edge_edge=self.edge_gap,
         )
 
 

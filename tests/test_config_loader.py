@@ -222,16 +222,16 @@ class TestConfigLoaderEnvVars:
             os.environ,
             {
                 "WIZERD_INPUT": "data/schema.sql",
-                "WIZERD_SPACING_LINE_GAP": "12.5",
-                "WIZERD_SPACING_LINE_TABLE_GAP": "15.0",
+                "WIZERD_SPACING_COLUMN_GAP": "210.0",
+                "WIZERD_SPACING_EDGE_GAP": "18.5",
             },
         ):
             cfg = loader.load()
 
         assert cfg.input_path == Path("data/schema.sql")
         assert cfg.custom_spacing is not None
-        assert cfg.custom_spacing.line_gap == 12.5
-        assert cfg.custom_spacing.line_table_gap == 15.0
+        assert cfg.custom_spacing.column_gap == 210.0
+        assert cfg.custom_spacing.edge_gap == 18.5
 
 
 class TestConfigLoaderPriority:
@@ -274,16 +274,16 @@ class TestConfigLoaderSpacing:
 
         config_dict = {
             "spacing": {
-                "line_gap": 50.0,
-                "line_table_gap": 40.0,
+                "column_gap": 260.0,
+                "edge_to_node_gap": 42.0,
             }
         }
 
         result = loader._merge_dict_into_config(cfg, config_dict)
 
         assert result.spacing_profile.name == "standard"
-        assert result.spacing_profile.line_gap == 50.0
-        assert result.spacing_profile.line_table_gap == 40.0
+        assert result.spacing_profile.column_gap == 260.0
+        assert result.spacing_profile.edge_to_node_gap == 42.0
 
     def test_spacing_profile_reset_clears_custom_spacing(self):
         """Switching profiles should drop lingering custom spacing overrides."""
@@ -296,12 +296,12 @@ class TestConfigLoaderSpacing:
             theme_name="default-dark",
         )
 
-        with_custom = loader._merge_dict_into_config(base_cfg, {"spacing": {"line_gap": 80.0}})
+        with_custom = loader._merge_dict_into_config(base_cfg, {"spacing": {"edge_gap": 18.0}})
         reset = loader._merge_dict_into_config(with_custom, {"spacing_profile": "compact"})
 
         assert reset.custom_spacing is None
         assert reset.spacing_profile.name == "compact"
-        assert reset.spacing_profile.line_gap == SpacingProfile.from_name("compact").line_gap
+        assert reset.spacing_profile.edge_gap == SpacingProfile.from_name("compact").edge_gap
 
 
 class TestConfigLoaderThemeOverrides:

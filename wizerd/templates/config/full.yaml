@@ -41,9 +41,12 @@ theme: default-dark
 
 # Custom spacing values (override spacing-profile)
 # spacing:
-#   line_gap: 50.0
-#   line_table_gap: 40.0
-#   entry_zone_gap: 45.0
+#   column_gap: 360.0      # Horizontal distance between table columns
+#   row_gap: 225.0         # Vertical distance between tables in a column
+#   component_gap: 570.0   # Gap between disconnected groups of tables
+#   edge_to_node_gap: 51.0 # Clearance between edges and tables
+#   edge_gap: 39.0         # Clearance between parallel edges
+#   margin: 72.0           # Canvas margin applied on both axes
 
 # Edge color mode: single or by-trunk
 # edge-color-mode: single

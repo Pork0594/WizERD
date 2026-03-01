@@ -55,7 +55,7 @@ Inflates table clearance, lane spacing, and ELK layer spacing. Best for:
 
 ### Standard
 
-![standard](./images/sample-default-dark.png)
+![standard](./images/sample-spacing-standard.png)
 
 Uses default spacing (similar to sample-default-dark)
 
@@ -88,6 +88,39 @@ WizERD also implements a spacing feedback loop:
 
 This automatic adjustment handles most congestion automatically.
 
+## Fine-grained spacing keys
+
+In addition to the three presets (`compact`, `standard`, `spacious`) you can tune exact layout gaps using a `spacing` mapping in your config file or via environment variables. These keys map directly to layout measurements and give predictable control over horizontal canvas usage.
+
+Key names (canonical):
+
+- `column_gap` — Horizontal distance between table columns (affects X-axis spacing)
+- `row_gap` — Vertical gap between tables in a column (affects Y-axis spacing)
+- `component_gap` — Gap between disconnected groups of tables
+- `edge_to_node_gap` — Clearance between edges and tables
+- `edge_gap` — Clearance between parallel edges (lane spacing)
+- `margin` — Canvas margin applied on both axes
+
+Example: tighten up horizontal spacing and edge lanes in `.wizerd.yaml`:
+
+```yaml
+spacing:
+  column_gap: 200.0
+  edge_gap: 18.0
+  margin: 32.0
+```
+
+## Tuning for tighter diagrams (practical tips)
+
+If ELK appears to leave a lot of empty horizontal space around labels, try these, in order:
+
+1. Use the `compact` preset: `-w compact` is the quickest way to shrink overall spacing.
+2. Reduce `column_gap` (e.g. set to `200.0`) to bring columns closer together.
+3. Reduce `edge_gap` (e.g. set to `18.0`) to tighten lanes between parallel edges.
+4. Reduce `margin` if you want less canvas padding around the whole diagram.
+5. If labels still seem oversized, consider disabling `--show-edge-labels` or adjusting label rendering (developer-level tweak: the label-width estimator lives in `wizerd/layout/engine.py` as `DEFAULT_EDGE_LABEL_CHAR_WIDTH`).
+
+Small incremental changes are recommended — lowering gaps too far can increase edge crossings or cause ELK to reroute lines unexpectedly.
 ## Choosing a Profile
 
 Start with `standard` for most use cases. Switch to:

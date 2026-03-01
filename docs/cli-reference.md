@@ -186,6 +186,17 @@ WIZERD_LOG_LEVEL=DEBUG wizerd generate schema.sql
 
 Levels: `DEBUG`, `INFO`, `WARNING`, `ERROR`
 
+### Version
+
+Show the installed WizERD version and exit. This option is eager and can be used without a subcommand.
+
+```bash
+# Print version
+wizerd --version
+# or
+wizerd -v
+```
+
 ## Exit Codes
 
 | Code | Meaning |
