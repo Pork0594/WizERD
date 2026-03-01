@@ -2,6 +2,17 @@
 
 <!-- version list -->
 
+## v0.1.3 (2026-03-01)
+
+### Bug Fixes
+
+- Add cli version command
+  ([`8fd3a9e`](https://github.com/Pork0594/WizERD/commit/8fd3a9e5fb2a5c83f96181b2c95bda7ecede4425))
+
+- Remove old docs files
+  ([`a16468e`](https://github.com/Pork0594/WizERD/commit/a16468ea886741734a2e56d5f4b369def87ca6e0))
+
+
 ## v0.1.2 (2026-03-01)
 
 ### Bug Fixes
