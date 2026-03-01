@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.3.0 (2026-03-01)
+
+### Features
+
+- Bundle elk dependencies
+  ([`ad483f4`](https://github.com/Pork0594/WizERD/commit/ad483f4cc3c8cfbef305e0d2c6d93fc9e8d0f6ca))
+
+
 ## v0.2.0 (2026-03-01)
 
 ### Bug Fixes
