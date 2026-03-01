@@ -35,30 +35,18 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Install dependencies
-        shell: bash
         run: |
-          uv venv .venv
-          source .venv/bin/activate
-          pip install -e ".[dev]"
+          uv sync --dev
           cd wizerd/layout && npm ci
 
       - name: Run tests
-        shell: bash
-        run: |
-          source .venv/bin/activate
-          pytest -v
+        run: uv run pytest -v
 
       - name: Run linter
-        shell: bash
-        run: |
-          source .venv/bin/activate
-          ruff check .
+        run: uv run ruff check .
 
       - name: Run type check
-        shell: bash
-        run: |
-          source .venv/bin/activate
-          mypy wizerd
+        run: uv run mypy wizerd
 
   build-binaries:
     name: Build binary (${{ matrix.os }})
@@ -95,21 +83,12 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Install dependencies
-        shell: bash
         run: |
-          uv venv .venv
-          source .venv/bin/activate
-          pip install -e ".[dev]"
+          uv sync --dev
           cd wizerd/layout && npm ci
 
-      - name: Install PyInstaller
-        run: uv pip install pyinstaller
-
       - name: Build binary
-        shell: bash
-        run: |
-          source .venv/bin/activate
-          pyinstaller wizerd.spec --clean
+        run: uv run pyinstaller wizerd.spec --clean
         env:
           WIZERD_BUNDLE_NODE: "1"
 
