@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
       - uses: actions/checkout@v4
@@ -34,27 +34,23 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
 
-      - name: Install dependencies
+      - name: Create venv and install dependencies
         run: |
           uv venv .venv
-          source .venv/bin/activate
-          pip install -e ".[dev]"
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m pip install -e ".[dev]"
           cd wizerd/layout && npm ci
 
       - name: Run tests
         run: |
-          source .venv/bin/activate
-          pytest -v
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m pytest -v
 
       - name: Run linter
         run: |
-          source .venv/bin/activate
-          ruff check .
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m ruff check .
 
       - name: Run type check
         run: |
-          source .venv/bin/activate
-          mypy wizerd
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m mypy wizerd
 
   lint-only:
     name: Lint only (Python 3.11)

@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
       - uses: actions/checkout@v4
@@ -34,19 +34,23 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
 
-      - name: Install dependencies
+      - name: Create venv and install dependencies
         run: |
-          uv sync --dev
+          uv venv .venv
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m pip install -e ".[dev]"
           cd wizerd/layout && npm ci
 
       - name: Run tests
-        run: uv run pytest -v
+        run: |
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m pytest -v
 
       - name: Run linter
-        run: uv run ruff check .
+        run: |
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m ruff check .
 
       - name: Run type check
-        run: uv run mypy wizerd
+        run: |
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m mypy wizerd
 
   build-binaries:
     name: Build binary (${{ matrix.os }})
@@ -82,41 +86,25 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
 
-      - name: Install dependencies
+      - name: Create venv and install dependencies
         run: |
-          uv sync --dev
+          uv venv .venv
+          .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m pip install -e ".[dev]"
           cd wizerd/layout && npm ci
 
       - name: Build binary
-        run: uv run pyinstaller wizerd.spec --clean
+        run: .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m PyInstaller wizerd.spec --clean
         env:
           WIZERD_BUNDLE_NODE: "1"
 
       - name: Create archive
-        shell: bash
         run: |
-          echo "=== Checking dist/ ==="
-          ls -la dist/ 2>/dev/null || echo "dist/ does not exist"
-          echo "=== Checking for wizerd binary ==="
-          ls -la wizerd* 2>/dev/null || echo "No wizerd files in root"
-          echo "=== Checking build/ ==="
-          ls -la build/ 2>/dev/null || echo "build/ does not exist"
-          
-          if [ -d "dist/wizerd" ]; then
-            cd dist/wizerd
-          elif [ -f "dist/wizerd" ]; then
-            mkdir -p dist/wizerd-temp
-            cp dist/wizerd dist/wizerd-temp/
-            cd dist/wizerd-temp
-          else
-            echo "Build output not found in expected location!"
-            exit 1
-          fi
-          
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cd dist/wizerd
             zip -r ../wizerd-${{ matrix.target }}.zip .
           else
-            tar -czvf ../wizerd-${{ matrix.target }}.tar.gz .
+            cd dist/wizerd
+            tar -czvf ../../wizerd-${{ matrix.target }}.tar.gz .
           fi
 
       - name: Upload binary
@@ -149,7 +137,7 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Install semantic-release
-        run: uv pip install python-semantic-release
+        run: uv pip install --system python-semantic-release
 
       - name: Run semantic-release
         env:
