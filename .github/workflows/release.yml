@@ -123,9 +123,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
 
-      - name: Install semantic-release
-        run: uv pip install --system python-semantic-release
-
       - name: Run semantic-release version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -135,11 +132,19 @@ jobs:
         id: semrel
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
           semantic-release publish
           NEW_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "")
           echo "tag=${NEW_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Upload to PyPI
+        if: steps.semrel.outputs.tag != ''
+        run: |
+          pip install twine
+          twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
 
       - name: Download all binaries
         if: steps.semrel.outputs.tag != ''
