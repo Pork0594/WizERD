@@ -25,6 +25,7 @@ jobs:
             target: macos-arm64
           - os: windows-latest
             target: windows-x64
+
     steps:
       - uses: actions/checkout@v4
 
@@ -50,25 +51,40 @@ jobs:
           .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m pip install -e ".[dev]"
 
       - name: Install Node dependencies
-        run: |
-          cd wizerd/layout && npm ci
+        run: cd wizerd/layout && npm ci
 
       - name: Build binary
         run: .venv/${{ matrix.os == 'windows-latest' && 'Scripts' || 'bin' }}/python -m PyInstaller wizerd.spec --clean
         env:
           WIZERD_BUNDLE_NODE: "1"
 
+      - name: List dist output
+        shell: bash
+        run: ls -lR dist/
+
       - name: Create archive (Unix)
         if: matrix.os != 'windows-latest'
         shell: bash
         run: |
-          tar -czvf dist/wizerd-${{ matrix.target }}.tar.gz -C dist wizerd
+          if [ -e "dist/wizerd" ]; then
+            tar -czvf dist/wizerd-${{ matrix.target }}.tar.gz -C dist wizerd
+          else
+            echo "ERROR: dist/wizerd not found. PyInstaller output:" && ls dist/ && exit 1
+          fi
 
       - name: Create archive (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          Compress-Archive -Path dist\wizerd -DestinationPath dist\wizerd-${{ matrix.target }}.zip
+          if (Test-Path dist\wizerd.exe) {
+            Compress-Archive -Path dist\wizerd.exe -DestinationPath dist\wizerd-${{ matrix.target }}.zip
+          } elseif (Test-Path dist\wizerd) {
+            Compress-Archive -Path dist\wizerd -DestinationPath dist\wizerd-${{ matrix.target }}.zip
+          } else {
+            Write-Host "ERROR: Neither dist\wizerd.exe nor dist\wizerd\ found. PyInstaller output:"
+            Get-ChildItem dist\
+            exit 1
+          }
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
