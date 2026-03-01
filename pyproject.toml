@@ -79,3 +79,17 @@ disallow_untyped_defs = false
 disallow_incomplete_defs = false
 ignore_missing_imports = true
 no_implicit_optional = false
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+branch = "main"
+upload_to_pypi = true
+upload_to_release = true
+build_command = "pip install build && python -m build"
+
+[tool.semantic_release.remote]
+type = "github"
+token = { env = "GH_TOKEN" }
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = true
