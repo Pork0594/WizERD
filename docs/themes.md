@@ -53,6 +53,8 @@ wizerd generate schema.sql -o diagram.svg -t dracula
 
 #### ocean
 
+![ocean](./images/sample-ocean.png)
+
 Deep ocean blue theme with cyan accents.
 
 ```bash
@@ -60,6 +62,8 @@ wizerd generate schema.sql -o diagram.svg -t ocean
 ```
 
 #### forest
+
+![forest](./images/sample-forest.png)
 
 Green theme inspired by nature.
 
@@ -69,6 +73,8 @@ wizerd generate schema.sql -o diagram.svg -t forest
 
 #### sunset
 
+![sunset](./images/sample-sunset.png)
+
 Warm sunset tones with orange and red.
 
 ```bash
@@ -76,6 +82,8 @@ wizerd generate schema.sql -o diagram.svg -t sunset
 ```
 
 #### nord
+
+![nord](./images/sample-nord.png)
 
 Arctic, north-bluish colors from the Nord color palette.
 
@@ -85,6 +93,8 @@ wizerd generate schema.sql -o diagram.svg -t nord
 
 #### solarized
 
+![solarized](./images/sample-solarized.png)
+
 Precision colors from the Solarized color scheme.
 
 ```bash
@@ -92,6 +102,8 @@ wizerd generate schema.sql -o diagram.svg -t solarized
 ```
 
 #### monochrome
+
+![monochrome](./images/sample-monochrome.png)
 
 High-contrast black and white.
 
@@ -101,6 +113,8 @@ wizerd generate schema.sql -o diagram.svg -t monochrome
 
 #### hacker
 
+![hacker](./images/sample-hacker.png)
+
 Classic terminal green on black.
 
 ```bash
@@ -108,6 +122,8 @@ wizerd generate schema.sql -o diagram.svg -t hacker
 ```
 
 #### high-contrast
+
+![high-contrast](./images/sample-high-contrast.png)
 
 Maximum contrast for accessibility.
 
@@ -139,6 +155,8 @@ wizerd generate schema.sql -o diagram.svg -t minimal
 
 #### soft
 
+![soft](./images/sample-soft.png)
+
 Neutral cream tones for a gentle appearance.
 
 ```bash
@@ -146,6 +164,8 @@ wizerd generate schema.sql -o diagram.svg -t soft
 ```
 
 ## Color by Trunk
+
+![color by trunk](./images/sample-feature-color-by-trunk.png)
 
 By default, all edges use a single color. Enable `color-by-trunk` to give each FK target a unique color:
 

@@ -55,6 +55,8 @@ Inflates table clearance, lane spacing, and ELK layer spacing. Best for:
 
 ### Standard
 
+![standard](./images/sample-default-dark.png)
+
 Uses default spacing (similar to sample-default-dark)
 
 ### Spacious
