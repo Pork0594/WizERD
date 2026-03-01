@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v0.2.0 (2026-03-01)
+
+### Bug Fixes
+
+- **ci**: Update pipeline triggers
+  ([`b2bae99`](https://github.com/Pork0594/WizERD/commit/b2bae994f54eb817f76f6484ff3fd55fe7469008))
+
+### Documentation
+
+- Update docs to use all sample images
+  ([`a0b4076`](https://github.com/Pork0594/WizERD/commit/a0b4076daf2b9870fd16cb2a9180d5224edbe128))
+
+### Features
+
+- Add comprehensive spacing config system and better spacing defaults
+  ([`e639d5d`](https://github.com/Pork0594/WizERD/commit/e639d5d881fb586fe4b844578a3d7ddd16771fb9))
+
+
 ## v0.1.3 (2026-03-01)
 
 ### Bug Fixes
