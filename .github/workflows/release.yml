@@ -103,14 +103,14 @@ jobs:
       - name: Build binary
         run: |
           source .venv/bin/activate
-          pyinstaller wizerd.spec --name wizerd-${{ matrix.target }}
+          pyinstaller wizerd.spec
         env:
           WIZERD_BUNDLE_NODE: "1"
 
       - name: Create archive
         shell: bash
         run: |
-          cd dist/wizerd-${{ matrix.target }}
+          cd dist/wizerd
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             zip -r ../wizerd-${{ matrix.target }}.zip .
           else
