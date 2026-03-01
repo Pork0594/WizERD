@@ -107,6 +107,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -121,7 +126,12 @@ jobs:
       - name: Install semantic-release
         run: uv pip install --system python-semantic-release
 
-      - name: Run semantic-release
+      - name: Run semantic-release version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: semantic-release version
+
+      - name: Run semantic-release publish
         id: semrel
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
