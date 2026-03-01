@@ -123,6 +123,9 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
 
+      - name: Install semantic-release
+        run: uv pip install --system python-semantic-release
+
       - name: Run semantic-release version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
