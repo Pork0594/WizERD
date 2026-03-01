@@ -13,25 +13,16 @@ WizERD supports multiple installation methods. Choose the one that fits your wor
 pip install wizerd
 ```
 
-### With Export Features (PNG/PDF)
-
-```bash
-pip install wizerd[export]
-```
-
-This installs CairoSVG for converting SVG outputs to PNG or PDF.
-
 ## Install from Source
 
 ```bash
 git clone https://github.com/Pork0594/wizerd.git
 cd wizerd
 pip install -r requirements.txt
-
-# Install Node.js dependencies for layout engine
-cd wizerd/layout && npm ci
-cd ../..
+pip install -e .
 ```
+
+Editable installs (and regular `pip install .`) run a build hook that executes `npm ci` inside `wizerd/layout/` and adds the resulting `node_modules` to the package. If you plan to run the CLI straight from the repository without installing it, run `npm ci` manually inside `wizerd/layout/` first so Node can resolve `elkjs`.
 
 ## Verify Installation
 
@@ -47,11 +38,9 @@ You should see the WizERD logo and help output.
 git clone https://github.com/Pork0594/wizerd.git
 cd wizerd
 pip install -e ".[dev]"
-
-# Install Node.js dependencies
-cd wizerd/layout && npm ci
-cd ../..
 ```
+
+The editable install takes care of `npm ci` automatically. Use `WIZERD_SKIP_NPM_CI=1` only if you have already populated `node_modules` (for example via a cached artifact) and want to skip the automatic install. Without the bundled dependencies, the ELK-backed layout engine will fail to import `elkjs`.
 
 This installs:
 - `pytest` — Testing framework

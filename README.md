@@ -56,7 +56,7 @@ See the [Installation Guide](docs/installation.md) for detailed instructions.
 ### Requirements
 
 - Python 3.9+
-- Node.js 18+ (for layout engine)
+- Node.js 18+ (runtime for the ELK layout engine)
 
 ### From PyPI
 
@@ -71,8 +71,16 @@ pip install wizerd[export]  # For PNG/PDF output
 git clone https://github.com/Pork0594/wizerd.git
 cd wizerd
 pip install -r requirements.txt
+pip install -e .
+```
+
+Editable installs (and any `pip install .`) trigger a build step that runs `npm ci` inside `wizerd/layout` and vendors the resulting `node_modules` into the package. If you prefer to run `python -m wizerd` straight from the checkout without installing, initialize the JS dependencies manually:
+
+```bash
 cd wizerd/layout && npm ci
 ```
+
+Set `WIZERD_SKIP_NPM_CI=1` before building if you already manage `node_modules` yourself and want to skip the automatic install.
 
 ## Usage
 

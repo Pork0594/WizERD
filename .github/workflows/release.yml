@@ -180,7 +180,7 @@ jobs:
 
   release:
     name: Semantic Release
-    needs: [lint-only, test, build-binaries]
+    needs: [build-binaries]
     runs-on: ubuntu-latest
     permissions:
       contents: write

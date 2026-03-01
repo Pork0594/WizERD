@@ -4,7 +4,7 @@ include pyproject.toml
 include Makefile
 
 recursive-include wizerd *.py *.yaml *.json *.mjs
-recursive-include wizerd/layout/node_modules *.js
+recursive-include wizerd/layout/node_modules *
 
 global-exclude __pycache__
 global-exclude *.py[co]
