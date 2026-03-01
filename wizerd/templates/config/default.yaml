@@ -1,0 +1,11 @@
+# WizERD Configuration
+# https://github.com/Pork0594/wizerd
+
+output: diagram.svg
+theme: default-dark
+
+# Optional: Enable edge labels
+# show-edge-labels: true
+
+# Optional: Choose spacing profile
+# spacing-profile: standard  # compact, standard, spacious

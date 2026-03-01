@@ -1,0 +1,154 @@
+{
+  "tables": {
+    "inventory.categories": {
+      "name": "inventory.categories",
+      "schema": "inventory",
+      "columns": [
+        {
+          "name": "id",
+          "data_type": "uuid",
+          "nullable": false,
+          "default": null,
+          "is_primary": true
+        },
+        {
+          "name": "name",
+          "data_type": "text",
+          "nullable": false,
+          "default": null,
+          "is_primary": false
+        }
+      ],
+      "foreign_keys": [],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [],
+      "check_constraints": [
+        {
+          "name": "categories_name_check",
+          "expression": "(char_length(name) > 0)"
+        }
+      ]
+    },
+    "inventory.product_categories": {
+      "name": "inventory.product_categories",
+      "schema": "inventory",
+      "columns": [
+        {
+          "name": "assigned_at",
+          "data_type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()",
+          "is_primary": false
+        },
+        {
+          "name": "category_id",
+          "data_type": "uuid",
+          "nullable": false,
+          "default": null,
+          "is_primary": true
+        },
+        {
+          "name": "product_id",
+          "data_type": "uuid",
+          "nullable": false,
+          "default": null,
+          "is_primary": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "product_categories_product_id_fkey",
+          "source_table": "inventory.product_categories",
+          "source_columns": [
+            "product_id"
+          ],
+          "target_table": "inventory.products",
+          "target_columns": [
+            "id"
+          ],
+          "on_delete": "CASCADE",
+          "on_update": null
+        },
+        {
+          "name": "product_categories_category_id_fkey",
+          "source_table": "inventory.product_categories",
+          "source_columns": [
+            "category_id"
+          ],
+          "target_table": "inventory.categories",
+          "target_columns": [
+            "id"
+          ],
+          "on_delete": "CASCADE",
+          "on_update": null
+        }
+      ],
+      "primary_key": [
+        "product_id",
+        "category_id"
+      ],
+      "unique_constraints": [],
+      "check_constraints": [
+        {
+          "name": null,
+          "expression": "(assigned_at IS NOT NULL)"
+        }
+      ]
+    },
+    "inventory.products": {
+      "name": "inventory.products",
+      "schema": "inventory",
+      "columns": [
+        {
+          "name": "created_at",
+          "data_type": "timestamp with time zone",
+          "nullable": false,
+          "default": "now()",
+          "is_primary": false
+        },
+        {
+          "name": "id",
+          "data_type": "uuid",
+          "nullable": false,
+          "default": null,
+          "is_primary": true
+        },
+        {
+          "name": "name",
+          "data_type": "text",
+          "nullable": true,
+          "default": null,
+          "is_primary": false
+        },
+        {
+          "name": "sku",
+          "data_type": "text",
+          "nullable": false,
+          "default": null,
+          "is_primary": false
+        }
+      ],
+      "foreign_keys": [],
+      "primary_key": [
+        "id"
+      ],
+      "unique_constraints": [
+        {
+          "name": "products_sku_unique",
+          "columns": [
+            "sku"
+          ]
+        },
+        {
+          "name": null,
+          "columns": [
+            "name"
+          ]
+        }
+      ],
+      "check_constraints": []
+    }
+  }
+}

@@ -1,0 +1,49 @@
+# WizERD Configuration - Full Options
+# https://github.com/your-org/wizerd
+
+# =============================================================================
+# Output Options
+# =============================================================================
+
+# Output file path
+output: diagram.svg
+
+# =============================================================================
+# Diagram Options
+# =============================================================================
+
+# Show foreign key names on connector lines
+show-edge-labels: false
+
+# Spacing preset: compact, standard, or spacious
+spacing-profile: standard
+
+# Use unique color per FK target (instead of single color)
+# color-by-trunk: false
+
+# =============================================================================
+# Theme Options
+# =============================================================================
+
+# Theme name or path to custom theme file
+theme: default-dark
+
+# Theme overrides (inline customization)
+# theme-overrides:
+#   colors:
+#     canvas_background: "#1a1a2e"
+#   typography:
+#     font_size_header: 16.0
+
+# =============================================================================
+# Advanced Options
+# =============================================================================
+
+# Custom spacing values (override spacing-profile)
+# spacing:
+#   line_gap: 50.0
+#   line_table_gap: 40.0
+#   entry_zone_gap: 45.0
+
+# Edge color mode: single or by-trunk
+# edge-color-mode: single

@@ -1,0 +1,2 @@
+# Install the package with development and export extras for local work.
+-e .[dev,export]

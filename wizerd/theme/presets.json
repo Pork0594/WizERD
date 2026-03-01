@@ -1,0 +1,699 @@
+[
+  {
+    "name": "default-dark",
+    "description": "Default dark theme with deep blue background",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#0f172a",
+      "table_background": "#0b1120",
+      "table_border": "#1d283a",
+      "table_header_bg": "#1e1b4b",
+      "table_header_text": "#f8fafc",
+      "table_body_text": "#cbd5f5",
+      "table_secondary_text": "#94a3b8",
+      "zebra_row": "#101b2d",
+      "pk_marker": "#fbbf24",
+      "fk_marker": "#38bdf8"
+    },
+    "typography": {
+      "font_family": "'Sora', 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif",
+      "font_size_header": 15.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 11.0,
+      "font_size_edge_label": 11.0,
+      "char_pixel_width": 6.5
+    },
+    "dimensions": {
+      "canvas_padding": 80.0,
+      "header_height": 44.0,
+      "row_height": 30.0,
+      "corner_radius": 12.0,
+      "table_stroke_width": 1.2,
+      "table_min_width": 220.0,
+      "table_max_width": 460.0,
+      "table_side_padding": 28.0
+    },
+    "edges": {
+      "edge_color": "#7dd3fc",
+      "edge_secondary": "#164e63",
+      "edge_width": 2.0,
+      "edge_trunk_width": 3.0,
+      "edge_corner_radius": 20.0,
+      "edge_color_palette": [
+        "#f472b6",
+        "#34d399",
+        "#fbbf24",
+        "#a78bfa",
+        "#fb923c",
+        "#22d3ee",
+        "#a3e635",
+        "#e879f9",
+        "#facc15",
+        "#4ade80",
+        "#60a5fa",
+        "#7dd3fc",
+        "#f87171",
+        "#818cf8",
+        "#2dd4bf"
+      ]
+    }
+  },
+  {
+    "name": "light",
+    "description": "Clean light theme with white background",
+    "is_dark": false,
+    "colors": {
+      "canvas_background": "#f8fafc",
+      "table_background": "#ffffff",
+      "table_border": "#cbd5e1",
+      "table_header_bg": "#f1f5f9",
+      "table_header_text": "#1e293b",
+      "table_body_text": "#334155",
+      "table_secondary_text": "#64748b",
+      "zebra_row": "#f8fafc",
+      "pk_marker": "#b45309",
+      "fk_marker": "#0369a1"
+    },
+    "typography": {
+      "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      "font_size_header": 14.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 10.0,
+      "font_size_edge_label": 10.0,
+      "char_pixel_width": 6.0
+    },
+    "dimensions": {
+      "canvas_padding": 60.0,
+      "header_height": 40.0,
+      "row_height": 28.0,
+      "corner_radius": 8.0,
+      "table_stroke_width": 1.0,
+      "table_min_width": 200.0,
+      "table_max_width": 400.0,
+      "table_side_padding": 24.0
+    },
+    "edges": {
+      "edge_color": "#0369a1",
+      "edge_secondary": "#94a3b8",
+      "edge_width": 1.5,
+      "edge_trunk_width": 2.5,
+      "edge_corner_radius": 15.0,
+      "edge_color_palette": [
+        "#0369a1",
+        "#0d9488",
+        "#b45309",
+        "#7c3aed",
+        "#db2777",
+        "#0891b2",
+        "#65a30d",
+        "#4f46e5",
+        "#e11d48",
+        "#059669"
+      ]
+    }
+  },
+  {
+    "name": "monochrome",
+    "description": "High-contrast monochrome theme",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#0c0c0c",
+      "table_background": "#080808",
+      "table_border": "#2a2a2a",
+      "table_header_bg": "#141414",
+      "table_header_text": "#f0f0f0",
+      "table_body_text": "#d0d0d0",
+      "table_secondary_text": "#888888",
+      "zebra_row": "#101010",
+      "pk_marker": "#ffffff",
+      "fk_marker": "#bbbbbb"
+    },
+    "typography": {
+      "font_family": "'JetBrains Mono', 'Fira Code', monospace",
+      "font_size_header": 14.0,
+      "font_size_body": 11.0,
+      "font_size_secondary": 10.0,
+      "font_size_edge_label": 10.0,
+      "char_pixel_width": 6.8
+    },
+    "dimensions": {
+      "canvas_padding": 70.0,
+      "header_height": 42.0,
+      "row_height": 28.0,
+      "corner_radius": 6.0,
+      "table_stroke_width": 1.5,
+      "table_min_width": 210.0,
+      "table_max_width": 420.0,
+      "table_side_padding": 26.0
+    },
+    "edges": {
+      "edge_color": "#c0c0c0",
+      "edge_secondary": "#404040",
+      "edge_width": 1.8,
+      "edge_trunk_width": 2.8,
+      "edge_corner_radius": 18.0,
+      "edge_color_palette": [
+        "#ffffff",
+        "#e0e0e0",
+        "#c0c0c0",
+        "#a0a0a0",
+        "#808080",
+        "#606060",
+        "#505050",
+        "#404040",
+        "#303030",
+        "#202020"
+      ]
+    }
+  },
+  {
+    "name": "solarized",
+    "description": "Solarized color palette theme",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#002b36",
+      "table_background": "#073642",
+      "table_border": "#586e75",
+      "table_header_bg": "#073642",
+      "table_header_text": "#fdf6e3",
+      "table_body_text": "#eee8d5",
+      "table_secondary_text": "#93a1a1",
+      "zebra_row": "#073642",
+      "pk_marker": "#b58900",
+      "fk_marker": "#2aa198"
+    },
+    "typography": {
+      "font_family": "'Source Code Pro', monospace",
+      "font_size_header": 14.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 10.0,
+      "font_size_edge_label": 10.0,
+      "char_pixel_width": 6.2
+    },
+    "dimensions": {
+      "canvas_padding": 75.0,
+      "header_height": 42.0,
+      "row_height": 29.0,
+      "corner_radius": 10.0,
+      "table_stroke_width": 1.3,
+      "table_min_width": 215.0,
+      "table_max_width": 440.0,
+      "table_side_padding": 27.0
+    },
+    "edges": {
+      "edge_color": "#2aa198",
+      "edge_secondary": "#0a535c",
+      "edge_width": 2.0,
+      "edge_trunk_width": 3.0,
+      "edge_corner_radius": 20.0,
+      "edge_color_palette": [
+        "#2aa198",
+        "#b58900",
+        "#cb4b16",
+        "#859900",
+        "#d33682",
+        "#6c71c4",
+        "#268bd2",
+        "#2aa198",
+        "#b58900",
+        "#cb4b16"
+      ]
+    }
+  },
+  {
+    "name": "high-contrast",
+    "description": "Accessibility-focused high contrast theme",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#000000",
+      "table_background": "#0a0a0a",
+      "table_border": "#ffffff",
+      "table_header_bg": "#1a1a1a",
+      "table_header_text": "#ffffff",
+      "table_body_text": "#ffffff",
+      "table_secondary_text": "#e5e5e5",
+      "zebra_row": "#0d0d0d",
+      "pk_marker": "#ffff00",
+      "fk_marker": "#00ffff"
+    },
+    "typography": {
+      "font_family": "'Arial', sans-serif",
+      "font_size_header": 16.0,
+      "font_size_body": 14.0,
+      "font_size_secondary": 12.0,
+      "font_size_edge_label": 12.0,
+      "char_pixel_width": 7.0
+    },
+    "dimensions": {
+      "canvas_padding": 90.0,
+      "header_height": 48.0,
+      "row_height": 34.0,
+      "corner_radius": 4.0,
+      "table_stroke_width": 2.0,
+      "table_min_width": 250.0,
+      "table_max_width": 500.0,
+      "table_side_padding": 32.0
+    },
+    "edges": {
+      "edge_color": "#00ffff",
+      "edge_secondary": "#666666",
+      "edge_width": 2.5,
+      "edge_trunk_width": 4.0,
+      "edge_corner_radius": 12.0,
+      "edge_color_palette": [
+        "#ffff00",
+        "#00ffff",
+        "#ff00ff",
+        "#00ff00",
+        "#ff0000",
+        "#ffffff",
+        "#ffff00",
+        "#00ffff",
+        "#ff00ff",
+        "#00ff00"
+      ]
+    }
+  },
+  {
+    "name": "ocean",
+    "description": "Deep ocean blue theme",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#0c1929",
+      "table_background": "#0f2744",
+      "table_border": "#1e4976",
+      "table_header_bg": "#163d66",
+      "table_header_text": "#e0f2fe",
+      "table_body_text": "#bae6fd",
+      "table_secondary_text": "#7dd3fc",
+      "zebra_row": "#0f2744",
+      "pk_marker": "#fbbf24",
+      "fk_marker": "#38bdf8"
+    },
+    "typography": {
+      "font_family": "'Nunito', -apple-system, sans-serif",
+      "font_size_header": 15.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 11.0,
+      "font_size_edge_label": 11.0,
+      "char_pixel_width": 6.4
+    },
+    "dimensions": {
+      "canvas_padding": 80.0,
+      "header_height": 44.0,
+      "row_height": 30.0,
+      "corner_radius": 12.0,
+      "table_stroke_width": 1.2,
+      "table_min_width": 220.0,
+      "table_max_width": 460.0,
+      "table_side_padding": 28.0
+    },
+    "edges": {
+      "edge_color": "#38bdf8",
+      "edge_secondary": "#0c4a6e",
+      "edge_width": 2.0,
+      "edge_trunk_width": 3.0,
+      "edge_corner_radius": 22.0,
+      "edge_color_palette": [
+        "#38bdf8",
+        "#fbbf24",
+        "#34d399",
+        "#a78bfa",
+        "#f472b6",
+        "#22d3ee",
+        "#fb923c",
+        "#e879f9",
+        "#4ade80",
+        "#60a5fa"
+      ]
+    }
+  },
+  {
+    "name": "forest",
+    "description": "Forest green theme",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#0a140a",
+      "table_background": "#0d1a0d",
+      "table_border": "#1a3d1a",
+      "table_header_bg": "#143514",
+      "table_header_text": "#d4f5d4",
+      "table_body_text": "#a8d8a8",
+      "table_secondary_text": "#6ab06a",
+      "zebra_row": "#0d1a0d",
+      "pk_marker": "#86efac",
+      "fk_marker": "#4ade80"
+    },
+    "typography": {
+      "font_family": "'Lora', serif",
+      "font_size_header": 15.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 11.0,
+      "font_size_edge_label": 11.0,
+      "char_pixel_width": 6.6
+    },
+    "dimensions": {
+      "canvas_padding": 78.0,
+      "header_height": 44.0,
+      "row_height": 30.0,
+      "corner_radius": 10.0,
+      "table_stroke_width": 1.3,
+      "table_min_width": 220.0,
+      "table_max_width": 450.0,
+      "table_side_padding": 28.0
+    },
+    "edges": {
+      "edge_color": "#4ade80",
+      "edge_secondary": "#14532d",
+      "edge_width": 2.0,
+      "edge_trunk_width": 3.0,
+      "edge_corner_radius": 20.0,
+      "edge_color_palette": [
+        "#4ade80",
+        "#86efac",
+        "#22c55e",
+        "#16a34a",
+        "#15803d",
+        "#166534",
+        "#14532d",
+        "#4ade80",
+        "#86efac",
+        "#22c55e"
+      ]
+    }
+  },
+  {
+    "name": "sunset",
+    "description": "Warm sunset theme",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#1a0a0a",
+      "table_background": "#2d0f0f",
+      "table_border": "#5c1a1a",
+      "table_header_bg": "#4a1a1a",
+      "table_header_text": "#fde8e8",
+      "table_body_text": "#fecaca",
+      "table_secondary_text": "#f87171",
+      "zebra_row": "#2d0f0f",
+      "pk_marker": "#fcd34d",
+      "fk_marker": "#fb923c"
+    },
+    "typography": {
+      "font_family": "'Merriweather', serif",
+      "font_size_header": 15.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 11.0,
+      "font_size_edge_label": 11.0,
+      "char_pixel_width": 6.5
+    },
+    "dimensions": {
+      "canvas_padding": 80.0,
+      "header_height": 44.0,
+      "row_height": 30.0,
+      "corner_radius": 11.0,
+      "table_stroke_width": 1.2,
+      "table_min_width": 220.0,
+      "table_max_width": 460.0,
+      "table_side_padding": 28.0
+    },
+    "edges": {
+      "edge_color": "#fb923c",
+      "edge_secondary": "#7c2d12",
+      "edge_width": 2.0,
+      "edge_trunk_width": 3.0,
+      "edge_corner_radius": 20.0,
+      "edge_color_palette": [
+        "#fb923c",
+        "#fcd34d",
+        "#f87171",
+        "#fbbf24",
+        "#f472b6",
+        "#fb923c",
+        "#fcd34d",
+        "#f87171",
+        "#fbbf24",
+        "#f472b6"
+      ]
+    }
+  },
+  {
+    "name": "minimal",
+    "description": "Minimal black and white theme",
+    "is_dark": false,
+    "colors": {
+      "canvas_background": "#ffffff",
+      "table_background": "#ffffff",
+      "table_border": "#000000",
+      "table_header_bg": "#ffffff",
+      "table_header_text": "#000000",
+      "table_body_text": "#000000",
+      "table_secondary_text": "#444444",
+      "zebra_row": "#ffffff",
+      "pk_marker": "#000000",
+      "fk_marker": "#333333"
+    },
+    "typography": {
+      "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+      "font_size_header": 13.0,
+      "font_size_body": 11.0,
+      "font_size_secondary": 9.0,
+      "font_size_edge_label": 9.0,
+      "char_pixel_width": 5.5
+    },
+    "dimensions": {
+      "canvas_padding": 50.0,
+      "header_height": 36.0,
+      "row_height": 24.0,
+      "corner_radius": 0.0,
+      "table_stroke_width": 1.0,
+      "table_min_width": 180.0,
+      "table_max_width": 350.0,
+      "table_side_padding": 20.0
+    },
+    "edges": {
+      "edge_color": "#000000",
+      "edge_secondary": "#aaaaaa",
+      "edge_width": 1.5,
+      "edge_trunk_width": 2.2,
+      "edge_corner_radius": 8.0,
+      "edge_color_palette": [
+        "#000000",
+        "#1a1a1a",
+        "#333333",
+        "#4d4d4d",
+        "#666666"
+      ]
+    }
+  },
+  {
+    "name": "soft",
+    "description": "Soft neutral tones theme",
+    "is_dark": false,
+    "colors": {
+      "canvas_background": "#faf5f0",
+      "table_background": "#ffffff",
+      "table_border": "#d4ccc0",
+      "table_header_bg": "#f5efe9",
+      "table_header_text": "#4a4036",
+      "table_body_text": "#5c5144",
+      "table_secondary_text": "#8a8072",
+      "zebra_row": "#faf5f0",
+      "pk_marker": "#8b6914",
+      "fk_marker": "#5c4033"
+    },
+    "typography": {
+      "font_family": "'Georgia', serif",
+      "font_size_header": 14.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 10.0,
+      "font_size_edge_label": 10.0,
+      "char_pixel_width": 6.0
+    },
+    "dimensions": {
+      "canvas_padding": 70.0,
+      "header_height": 42.0,
+      "row_height": 28.0,
+      "corner_radius": 8.0,
+      "table_stroke_width": 1.0,
+      "table_min_width": 200.0,
+      "table_max_width": 420.0,
+      "table_side_padding": 24.0
+    },
+    "edges": {
+      "edge_color": "#5c5144",
+      "edge_secondary": "#c8c0b4",
+      "edge_width": 1.5,
+      "edge_trunk_width": 2.5,
+      "edge_corner_radius": 15.0,
+      "edge_color_palette": [
+        "#5c5144",
+        "#6b5d4d",
+        "#7a6a58",
+        "#8a7966",
+        "#4a3f35",
+        "#3d332a",
+        "#706050",
+        "#605040",
+        "#504030",
+        "#403020"
+      ]
+    }
+  },
+  {
+    "name": "hacker",
+    "description": "Classic terminal green on black",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#0d0d0d",
+      "table_background": "#0a0a0a",
+      "table_border": "#1a1a1a",
+      "table_header_bg": "#0d0d0d",
+      "table_header_text": "#00ff00",
+      "table_body_text": "#00cc00",
+      "table_secondary_text": "#008800",
+      "zebra_row": "#0a0a0a",
+      "pk_marker": "#00ff00",
+      "fk_marker": "#00ff00"
+    },
+    "typography": {
+      "font_family": "'Courier New', Courier, monospace",
+      "font_size_header": 14.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 10.0,
+      "font_size_edge_label": 10.0,
+      "char_pixel_width": 7.2
+    },
+    "dimensions": {
+      "canvas_padding": 60.0,
+      "header_height": 40.0,
+      "row_height": 26.0,
+      "corner_radius": 0.0,
+      "table_stroke_width": 1.0,
+      "table_min_width": 200.0,
+      "table_max_width": 400.0,
+      "table_side_padding": 24.0
+    },
+    "edges": {
+      "edge_color": "#00ff00",
+      "edge_secondary": "#004400",
+      "edge_width": 1.5,
+      "edge_trunk_width": 2.5,
+      "edge_corner_radius": 0.0,
+      "edge_color_palette": [
+        "#00ff00",
+        "#00cc00",
+        "#009900",
+        "#006600",
+        "#003300"
+      ]
+    }
+  },
+  {
+    "name": "nord",
+    "description": "Nord color palette theme",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#2e3440",
+      "table_background": "#3b4252",
+      "table_border": "#434c5e",
+      "table_header_bg": "#3b4252",
+      "table_header_text": "#eceff4",
+      "table_body_text": "#e5e9f0",
+      "table_secondary_text": "#d8dee9",
+      "zebra_row": "#3b4252",
+      "pk_marker": "#ebcb8b",
+      "fk_marker": "#88c0d0"
+    },
+    "typography": {
+      "font_family": "'Segoe UI', -apple-system, sans-serif",
+      "font_size_header": 14.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 10.0,
+      "font_size_edge_label": 10.0,
+      "char_pixel_width": 6.0
+    },
+    "dimensions": {
+      "canvas_padding": 70.0,
+      "header_height": 42.0,
+      "row_height": 28.0,
+      "corner_radius": 6.0,
+      "table_stroke_width": 1.2,
+      "table_min_width": 210.0,
+      "table_max_width": 430.0,
+      "table_side_padding": 26.0
+    },
+    "edges": {
+      "edge_color": "#88c0d0",
+      "edge_secondary": "#4c566a",
+      "edge_width": 1.8,
+      "edge_trunk_width": 2.8,
+      "edge_corner_radius": 16.0,
+      "edge_color_palette": [
+        "#88c0d0",
+        "#81a1c1",
+        "#5e81ac",
+        "#b48ead",
+        "#a3be8c",
+        "#ebcb8b",
+        "#d08770",
+        "#bf616a",
+        "#88c0d0",
+        "#81a1c1"
+      ]
+    }
+  },
+  {
+    "name": "dracula",
+    "description": "Dracula color palette theme",
+    "is_dark": true,
+    "colors": {
+      "canvas_background": "#21222c",
+      "table_background": "#282a36",
+      "table_border": "#44475a",
+      "table_header_bg": "#44475a",
+      "table_header_text": "#f8f8f2",
+      "table_body_text": "#f8f8f2",
+      "table_secondary_text": "#6272a4",
+      "zebra_row": "#282a36",
+      "pk_marker": "#ffb86c",
+      "fk_marker": "#8be9fd"
+    },
+    "typography": {
+      "font_family": "'Fira Code', monospace",
+      "font_size_header": 14.0,
+      "font_size_body": 12.0,
+      "font_size_secondary": 10.0,
+      "font_size_edge_label": 10.0,
+      "char_pixel_width": 6.2
+    },
+    "dimensions": {
+      "canvas_padding": 75.0,
+      "header_height": 42.0,
+      "row_height": 28.0,
+      "corner_radius": 8.0,
+      "table_stroke_width": 1.2,
+      "table_min_width": 215.0,
+      "table_max_width": 440.0,
+      "table_side_padding": 26.0
+    },
+    "edges": {
+      "edge_color": "#8be9fd",
+      "edge_secondary": "#44475a",
+      "edge_width": 1.8,
+      "edge_trunk_width": 2.8,
+      "edge_corner_radius": 18.0,
+      "edge_color_palette": [
+        "#ff79c6",
+        "#bd93f9",
+        "#8be9fd",
+        "#50fa7b",
+        "#ffb86c",
+        "#f1fa8c",
+        "#ff5555",
+        "#f8f8f2",
+        "#6272a4",
+        "#44475a"
+      ]
+    }
+  }
+]

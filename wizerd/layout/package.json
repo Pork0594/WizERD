@@ -1,0 +1,13 @@
+{
+  "name": "wizerd-layout",
+  "version": "0.2.0",
+  "description": "Production layout helpers for WizERD",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "check": "node --version"
+  },
+  "dependencies": {
+    "elkjs": "^0.9.3"
+  }
+}

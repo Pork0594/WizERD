@@ -1,0 +1,106 @@
+# Installation
+
+WizERD supports multiple installation methods. Choose the one that fits your workflow.
+
+## Requirements
+
+- Python 3.9 or higher
+- Node.js 18+ (for the layout engine)
+
+## Install from PyPI
+
+```bash
+pip install wizerd
+```
+
+### With Export Features (PNG/PDF)
+
+```bash
+pip install wizerd[export]
+```
+
+This installs CairoSVG for converting SVG outputs to PNG or PDF.
+
+## Install from Source
+
+```bash
+git clone https://github.com/Pork0594/wizerd.git
+cd wizerd
+pip install -r requirements.txt
+
+# Install Node.js dependencies for layout engine
+cd wizerd/layout && npm ci
+cd ../..
+```
+
+## Verify Installation
+
+```bash
+wizerd --help
+```
+
+You should see the WizERD logo and help output.
+
+## Development Installation
+
+```bash
+git clone https://github.com/Pork0594/wizerd.git
+cd wizerd
+pip install -e ".[dev]"
+
+# Install Node.js dependencies
+cd wizerd/layout && npm ci
+cd ../..
+```
+
+This installs:
+- `pytest` — Testing framework
+- `ruff` — Linting
+- `mypy` — Type checking
+- `build` — Package building
+- `twine` — PyPI publishing
+- `pyinstaller` — Binary builds
+- `python-semantic-release` — Automated releases
+
+## Pre-built Binaries
+
+Download pre-built binaries from the [releases page](https://github.com/Pork0594/wizerd/releases):
+
+```bash
+# Linux x64
+curl -sL https://github.com/Pork0594/wizerd/releases/latest/download/wizerd-linux-x64.tar.gz | tar xz
+./wizerd generate schema.sql -o diagram.svg
+
+# macOS ARM (Apple Silicon)
+curl -sL https://github.com/Pork0594/wizerd/releases/latest/download/wizerd-macos-arm64.tar.gz | tar xz
+
+# macOS x64
+curl -sL https://github.com/Pork0594/wizerd/releases/latest/download/wizerd-macos-x64.tar.gz | tar xz
+
+# Windows
+curl -sL https://github.com/Pork0594/wizerd/releases/latest/download/wizerd-windows-x64.zip -o wizerd.zip
+unzip wizerd.zip
+```
+
+## Node.js Dependency
+
+WizERD uses ELK (Eclipse Layout Kernel) via Node.js for the layout engine. If `node` is not installed, the CLI will report a clear error.
+
+To verify Node.js is available:
+
+```bash
+node --version  # Should be 18.0.0 or higher
+```
+
+## System Requirements Summary
+
+| Component | Minimum Version |
+|-----------|-----------------|
+| Python | 3.9+ |
+| Node.js | 18+ |
+| pip | Latest recommended |
+
+## Next Steps
+
+- [Getting Started](getting-started.md) — Generate your first diagram
+- [Configuration](configuration.md) — Customize your setup

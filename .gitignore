@@ -1,0 +1,37 @@
+# === OS / Editor files ===
+.DS_Store
+/.idea/
+/.vscode/
+
+# === Python virtualenv ===
+.venv/
+
+# === Python caches / bytecode ===
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+
+# === Build / packaging artifacts ===
+build/
+dist/
+*.egg-info/
+
+# === Node artifacts (nested anywhere) ===
+**/node_modules/
+
+# === Generated diagrams and outputs ===
+dev/outputs/*
+!dev/outputs/.gitkeep
+!dev/outputs/README.md
+
+# === Local, private SQL dumps ===
+dev/dumps/*
+!dev/dumps/
+!dev/dumps/.gitkeep
+!dev/dumps/README.md
+!dev/dumps/examples/
+
+# === Misc ===
+output/
