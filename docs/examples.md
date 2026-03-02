@@ -10,18 +10,6 @@ This page provides practical examples for common use cases.
 wizerd generate schema.sql -o diagram.svg
 ```
 
-### Convert SVG to PNG
-
-WizERD outputs SVG. Convert to PNG using `rsvg-convert` or `cairosvg`:
-
-```bash
-# Generate SVG first
-wizerd generate schema.sql -o diagram.svg
-
-# Convert to PNG
-rsvg-convert -h 800 diagram.svg -o diagram.png
-```
-
 ### Use a different theme
 
 ```bash
@@ -166,28 +154,6 @@ wizerd generate schema.sql \
 wizerd generate schema.sql \
   -o diagram.svg \
   -t minimal
-```
-
-## Using Example Schemas
-
-WizERD includes example schemas in `dev/dumps/examples/`:
-
-### Simple (2 tables)
-
-```bash
-wizerd generate dev/dumps/examples/simple_schema.sql -o simple.svg
-```
-
-### Music Platform (20+ tables)
-
-```bash
-wizerd generate dev/dumps/examples/schema.sql -o music.svg
-```
-
-### Large Schema (50+ tables)
-
-```bash
-wizerd generate dev/dumps/examples/large_schema.sql -o large.svg
 ```
 
 ## Validation

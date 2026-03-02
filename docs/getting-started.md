@@ -9,14 +9,7 @@ This guide walks through generating your first ER diagram with WizERD.
 
 ## Step 1: Prepare Your Schema
 
-If you don't have a schema file, you can use the included example:
-
-```bash
-# The music streaming platform schema (20+ tables)
-cp dev/dumps/examples/schema.sql ./my-schema.sql
-```
-
-Or dump your actual PostgreSQL database:
+Dump your PostgreSQL database schema:
 
 ```bash
 pg_dump --schema-only mydatabase > schema.sql
@@ -88,30 +81,6 @@ brew install librsvg
 
 # Convert SVG to PNG
 rsvg-convert -h 800 diagram.svg -o diagram.png
-```
-
-## Example: Music Streaming Platform
-
-Let's walk through a complete example using the included music schema:
-
-```bash
-# Parse and inspect the schema first
-wizerd parse dev/dumps/examples/schema.sql | head -100
-
-# Generate default diagram
-wizerd generate dev/dumps/examples/schema.sql -o music-erd.svg
-
-# Generate with light theme and edge labels
-wizerd generate dev/dumps/examples/schema.sql \
-  -o music-erd-light.svg \
-  -t light \
-  --show-edge-labels
-
-# Generate with color by FK target
-wizerd generate dev/dumps/examples/schema.sql \
-  -o music-erd-colored.svg \
-  -t default-dark \
-  --color-by-trunk
 ```
 
 ## What the Diagram Shows

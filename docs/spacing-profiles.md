@@ -6,6 +6,8 @@ WizERD's auto-layout derives all routing and layering constants from a spacing p
 
 ### compact
 
+![compact](./images/sample-spacing-compact.png)
+
 ```bash
 wizerd generate schema.sql -o diagram.svg -w compact
 ```
@@ -17,6 +19,8 @@ Keeps tables closer together using smaller lane/lateral clearances. Best for:
 
 ### standard
 
+![standard](./images/sample-spacing-standard.png)
+
 ```bash
 wizerd generate schema.sql -o diagram.svg -w standard
 ```
@@ -27,6 +31,8 @@ The production default. Balanced readability without massive canvases. Best for:
 - General documentation
 
 ### spacious
+
+![spacious](./images/sample-spacing-spacious.png)
 
 ```bash
 wizerd generate schema.sql -o diagram.svg -w spacious
@@ -46,24 +52,6 @@ Inflates table clearance, lane spacing, and ELK layer spacing. Best for:
 | Entry margins | Small | Medium | Large |
 | Canvas size | Smallest | Medium | Largest |
 | Best for | Quick views | Production | Complex schemas |
-
-## Visual Comparison
-
-### Compact
-
-![compact](./images/sample-spacing-compact.png)
-
-### Standard
-
-![standard](./images/sample-spacing-standard.png)
-
-Uses default spacing (similar to sample-default-dark)
-
-### Spacious
-
-![spacious](./images/sample-spacing-spacious.png)
-
-Notice how the relationships have more room to breathe in the spacious layout.
 
 ## How It Works
 

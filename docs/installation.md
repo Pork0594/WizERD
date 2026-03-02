@@ -29,27 +29,6 @@ Editable installs run a build hook that executes `npm ci` inside `wizerd/layout/
 wizerd --help
 ```
 
-You should see the WizERD logo and help output.
-
-## Development Installation
-
-```bash
-git clone https://github.com/Pork0594/wizerd.git
-cd wizerd
-pip install -e ".[dev]"
-```
-
-This installs pytest, ruff, mypy, and other dev dependencies. The editable install handles `npm ci` automatically.
-
-This installs:
-- `pytest` — Testing framework
-- `ruff` — Linting
-- `mypy` — Type checking
-- `build` — Package building
-- `twine` — PyPI publishing
-- `pyinstaller` — Binary builds
-- `python-semantic-release` — Automated releases
-
 ## Pre-built Binaries
 
 Download pre-built binaries from the [releases page](https://github.com/Pork0594/wizerd/releases):

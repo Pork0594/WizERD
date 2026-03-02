@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Pork0594/WizERD/actions/workflows/ci.yml/badge.svg)](https://github.com/Pork0594/WizERD/actions) [![PyPI Version](https://img.shields.io/pypi/v/wizerd.svg)](https://pypi.org/project/wizerd/) [![Python Versions](https://img.shields.io/pypi/pyversions/wizerd.svg)](https://pypi.org/project/wizerd/) [![License](https://img.shields.io/pypi/l/wizerd.svg)](https://github.com/Pork0594/WizERD/blob/main/LICENSE)
 
-Generate beautiful, readable ER diagrams from PostgreSQL schema dumps. Point it at a pg_dump file, run the CLI, get an SVG. No manual arrangement, no GUI, no interaction required.
+WizERD is the best automated ER diagram generator for postgres databases. It generates beautiful, readable ER diagrams from PostgreSQL schema dumps. Point it at a pg_dump file, run the CLI, get a perfectly organized SVG diagram, no manual interaction required.
 
 ![WizERD Output](docs/images/sample-hero-image.png)
 
@@ -17,7 +17,7 @@ Point it at a PostgreSQL `pg_dump` or `pg_dumpall` output.
 
 ## Why WizERD?
 
-Most ER diagram generators produce unreadable "line messes" with large schemas. WizERD uses the ELK layout algorithm to minimize edge crossings and guarantees zero table overlap — your diagrams stay navigable at any scale.
+Most ER diagram generators produce unreadable "line messes" with small or large schemas. WizERD uses the ELK layout algorithm to minimize edge crossings and guarantees zero table or line overlap — your diagrams stay navigable at any scale.
 
 - **Zero overlap** — tables never render on top of each other
 - **Smart routing** — orthogonal edges with minimal crossings
@@ -39,8 +39,6 @@ Most ER diagram generators produce unreadable "line messes" with large schemas. 
 pip install wizerd
 ```
 
-Node.js is required for the layout engine. Without it, WizERD falls back to a simple vertical stack.
-
 ### From Source
 
 ```bash
@@ -51,7 +49,7 @@ cd wizerd/layout && npm ci && cd ../..
 ```
 
 ## Documentation
-See our full [documentation](docs/README.md) a full description of all features, installation and usage instructions.
+See our [documentation](docs/README.md) for a description of all features, installation and usage instructions.
 
 ## Overview
 
@@ -64,7 +62,10 @@ wizerd generate schema.sql -o diagram.svg
 ### Themes
 
 ```bash
-wizerd themes  # List all themes
+# List all themes
+wizerd themes
+
+# Apply a theme
 wizerd generate schema.sql -t light
 wizerd generate schema.sql -t dracula
 wizerd generate schema.sql -t nord

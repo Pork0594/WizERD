@@ -97,7 +97,7 @@ wizerd generate schema.sql
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `output` | string | `diagram.svg` | Output file path |
-| `theme` | string or dict | `default-dark` | Theme name (string) or full theme definition (dict) |
+| `theme` | string or dict | `default-dark` | Theme name (string) or [full theme definition](themes.md#custom-themes) (dict) |
 | `theme-overrides` | dict | — | Partial theme customizations (colors, typography, etc.) |
 | `show-edge-labels` | boolean | `false` | Show FK names on connectors |
 | `spacing-profile` | string | `compact, standard, spacious` | Spacing preset |
