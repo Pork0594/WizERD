@@ -78,12 +78,16 @@ wizerd generate schema.sql -o diagram-compact.svg -w compact
 wizerd generate schema.sql -o diagram-spacious.svg -w spacious
 ```
 
-## Step 6: Export to PNG
+## Step 6: Convert to PNG (optional)
 
-If you installed with export features:
+WizERD outputs SVG by default. To convert to PNG, use a tool like `rsvg-convert` or `cairosvg`:
 
 ```bash
-wizerd generate schema.sql -o diagram.png
+# Install rsvg-convert (macOS)
+brew install librsvg
+
+# Convert SVG to PNG
+rsvg-convert -h 800 diagram.svg -o diagram.png
 ```
 
 ## Example: Music Streaming Platform
@@ -123,6 +127,6 @@ Each table in the diagram includes:
 ## Next Steps
 
 - [Configuration](configuration.md) — Use config files for repeatable setups
-- [Themes](themes.md) — Explore all 14 themes
+- [Themes](themes.md) — Explore all 13 themes
 - [Examples](examples.md) — More command examples
 - [CLI Reference](cli-reference.md) — Complete command documentation

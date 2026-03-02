@@ -1,6 +1,6 @@
 # Themes
 
-WizERD includes 14 built-in themes to match any aesthetic preference.
+WizERD includes 13 built-in themes to match any aesthetic preference.
 
 ## List Available Themes
 
@@ -177,10 +177,10 @@ This makes it easier to trace relationships to specific tables.
 
 ## Custom Themes
 
-You can create custom themes by providing a theme file:
+You can create custom themes by providing a theme file path to `--theme`:
 
 ```bash
-wizerd generate schema.sql -o diagram.svg --theme-file my-custom-theme.json
+wizerd generate schema.sql -o diagram.svg -t ./my-custom-theme.json
 ```
 
 Theme file format:

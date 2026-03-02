@@ -10,10 +10,16 @@ This page provides practical examples for common use cases.
 wizerd generate schema.sql -o diagram.svg
 ```
 
-### Generate PNG from schema
+### Convert SVG to PNG
+
+WizERD outputs SVG. Convert to PNG using `rsvg-convert` or `cairosvg`:
 
 ```bash
-wizerd generate schema.sql -o diagram.png
+# Generate SVG first
+wizerd generate schema.sql -o diagram.svg
+
+# Convert to PNG
+rsvg-convert -h 800 diagram.svg -o diagram.png
 ```
 
 ### Use a different theme

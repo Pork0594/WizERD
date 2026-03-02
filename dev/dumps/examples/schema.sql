@@ -1,267 +1,286 @@
--- Music Streaming Platform Schema
--- Enable UUID extension
+-- DevOps CI/CD Pipeline & Operations Platform
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Users and Authentication
-CREATE TABLE users(
-    user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    username varchar(50) UNIQUE NOT NULL,
-    email varchar(255) UNIQUE NOT NULL,
-    password_hash varchar(255) NOT NULL,
-    display_name varchar(100),
-    avatar_url text,
-    country_code char(2),
-    date_of_birth date,
-    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    last_login timestamp,
-    is_verified boolean DEFAULT FALSE,
-    is_active boolean DEFAULT TRUE
-);
-
--- Subscription Plans
-CREATE TABLE subscription_plans(
-    plan_id serial PRIMARY KEY,
-    plan_name varchar(50) UNIQUE NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    currency char(3) DEFAULT 'USD',
-    max_quality varchar(20),
-    allows_offline boolean DEFAULT FALSE,
-    allows_ads boolean DEFAULT TRUE,
-    max_skip_count integer,
-    description text
-);
-
--- User Subscriptions
-CREATE TABLE user_subscriptions(
-    subscription_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id uuid NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    plan_id integer NOT NULL REFERENCES subscription_plans(plan_id),
-    start_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    end_date timestamp,
-    is_active boolean DEFAULT TRUE,
-    auto_renew boolean DEFAULT TRUE,
-    payment_method varchar(50)
-);
-
--- Artists
-CREATE TABLE artists(
-    artist_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    artist_name varchar(255) NOT NULL,
-    bio text,
-    country varchar(100),
-    profile_image_url text,
-    verified boolean DEFAULT FALSE,
-    monthly_listeners integer DEFAULT 0,
+CREATE TABLE organizations(
+    org_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_name varchar(255) NOT NULL,
+    plan_tier varchar(50),
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- Genres
-CREATE TABLE genres(
-    genre_id serial PRIMARY KEY,
-    genre_name varchar(100) UNIQUE NOT NULL,
+CREATE TABLE teams(
+    team_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_id uuid NOT NULL REFERENCES organizations(org_id) ON DELETE CASCADE,
+    team_name varchar(255) NOT NULL,
+    team_type varchar(50)
+);
+
+CREATE TABLE projects(
+    project_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_id uuid NOT NULL REFERENCES teams(team_id) ON DELETE CASCADE,
+    project_name varchar(255) NOT NULL,
     description text,
-    parent_genre_id integer REFERENCES genres(genre_id)
-);
-
--- Albums
-CREATE TABLE albums(
-    album_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    album_title varchar(255) NOT NULL,
-    artist_id uuid NOT NULL REFERENCES artists(artist_id) ON DELETE CASCADE,
-    release_date date,
-    album_type varchar(20) CHECK (album_type IN ('album', 'single', 'ep', 'compilation')),
-    cover_art_url text,
-    total_tracks integer,
-    label varchar(255),
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- Songs/Tracks
-CREATE TABLE songs(
-    song_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    song_title varchar(255) NOT NULL,
-    album_id uuid REFERENCES albums(album_id) ON DELETE SET NULL,
-    duration_seconds integer NOT NULL,
-    track_number integer,
-    disc_number integer DEFAULT 1,
-    explicit boolean DEFAULT FALSE,
-    isrc varchar(12) UNIQUE,
-    audio_file_url text,
-    preview_url text,
-    play_count bigint DEFAULT 0,
+CREATE TABLE repositories(
+    repo_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id uuid NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
+    repo_name varchar(255) NOT NULL,
+    git_url text,
+    default_branch varchar(100) DEFAULT 'main'
+);
+
+CREATE TABLE branches(
+    branch_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    repo_id uuid NOT NULL REFERENCES repositories(repo_id) ON DELETE CASCADE,
+    branch_name varchar(255) NOT NULL,
+    is_protected boolean DEFAULT FALSE,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- Song Artists (for collaborations)
-CREATE TABLE song_artists(
-    song_id uuid REFERENCES songs(song_id) ON DELETE CASCADE,
-    artist_id uuid REFERENCES artists(artist_id) ON DELETE CASCADE,
-    artist_role varchar(50) DEFAULT 'primary' CHECK (artist_role IN ('primary', 'featured', 'composer', 'producer')),
-    PRIMARY KEY (song_id, artist_id, artist_role)
+CREATE TABLE commits(
+    commit_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    branch_id uuid NOT NULL REFERENCES branches(branch_id) ON DELETE CASCADE,
+    commit_hash varchar(40) UNIQUE NOT NULL,
+    author_email varchar(255),
+    commit_message text,
+    committed_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- Song Genres (many-to-many)
-CREATE TABLE song_genres(
-    song_id uuid REFERENCES songs(song_id) ON DELETE CASCADE,
-    genre_id integer REFERENCES genres(genre_id) ON DELETE CASCADE,
-    PRIMARY KEY (song_id, genre_id)
-);
-
--- Playlists
-CREATE TABLE playlists(
-    playlist_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id uuid NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    playlist_name varchar(255) NOT NULL,
+CREATE TABLE pull_requests(
+    pr_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    source_branch_id uuid NOT NULL REFERENCES branches(branch_id) ON DELETE CASCADE,
+    target_branch_id uuid NOT NULL REFERENCES branches(branch_id) ON DELETE RESTRICT,
+    head_commit_id uuid REFERENCES commits(commit_id),
+    title varchar(500),
     description text,
-    is_public boolean DEFAULT TRUE,
-    is_collaborative boolean DEFAULT FALSE,
-    cover_image_url text,
-    follower_count integer DEFAULT 0,
-    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    status varchar(20) CHECK (status IN ('open', 'merged', 'closed', 'draft')),
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE code_reviews(
+    review_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    pr_id uuid NOT NULL REFERENCES pull_requests(pr_id) ON DELETE CASCADE,
+    reviewer_email varchar(255),
+    status varchar(20) CHECK (status IN ('pending', 'approved', 'changes_requested', 'commented')),
+    reviewed_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE builds(
+    build_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    commit_id uuid NOT NULL REFERENCES commits(commit_id) ON DELETE CASCADE,
+    build_number integer NOT NULL,
+    status varchar(20) CHECK (status IN ('queued', 'running', 'success', 'failed', 'cancelled')),
+    started_at timestamp,
+    completed_at timestamp,
+    duration_seconds integer
+);
+
+CREATE TABLE build_artifacts(
+    artifact_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    build_id uuid NOT NULL REFERENCES builds(build_id) ON DELETE CASCADE,
+    artifact_name varchar(255),
+    artifact_type varchar(50),
+    file_size_bytes bigint,
+    storage_url text
+);
+
+CREATE TABLE test_runs(
+    test_run_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    build_id uuid NOT NULL REFERENCES builds(build_id) ON DELETE CASCADE,
+    test_suite_name varchar(255),
+    total_tests integer,
+    passed_tests integer,
+    failed_tests integer,
+    skipped_tests integer,
+    started_at timestamp,
+    completed_at timestamp
+);
+
+CREATE TABLE test_cases(
+    test_case_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    test_run_id uuid NOT NULL REFERENCES test_runs(test_run_id) ON DELETE CASCADE,
+    test_name varchar(500),
+    status varchar(20) CHECK (status IN ('passed', 'failed', 'skipped', 'error')),
+    duration_ms integer,
+    error_message text
+);
+
+CREATE TABLE environments(
+    env_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id uuid NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
+    env_name varchar(100) CHECK (env_name IN ('development', 'staging', 'production', 'qa')),
+    cluster_name varchar(255),
+    region varchar(100)
+);
+
+CREATE TABLE deployments(
+    deployment_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    artifact_id uuid NOT NULL REFERENCES build_artifacts(artifact_id) ON DELETE RESTRICT,
+    env_id uuid NOT NULL REFERENCES environments(env_id) ON DELETE RESTRICT,
+    deployed_by varchar(255),
+    deployment_strategy varchar(50),
+    status varchar(20) CHECK (status IN ('pending', 'in_progress', 'success', 'failed', 'rolled_back')),
+    started_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    completed_at timestamp
+);
+
+CREATE TABLE deployment_logs(
+    log_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    deployment_id uuid NOT NULL REFERENCES deployments(deployment_id) ON DELETE CASCADE,
+    log_level varchar(20),
+    log_message text,
+    logged_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE monitoring_metrics(
+    metric_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    deployment_id uuid NOT NULL REFERENCES deployments(deployment_id) ON DELETE CASCADE,
+    metric_name varchar(255),
+    metric_value DECIMAL(15, 4),
+    unit varchar(50),
+    recorded_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE alerts(
+    alert_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    metric_id uuid NOT NULL REFERENCES monitoring_metrics(metric_id) ON DELETE CASCADE,
+    severity varchar(20) CHECK (severity IN ('info', 'warning', 'critical')),
+    alert_message text,
+    triggered_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    acknowledged boolean DEFAULT FALSE
+);
+
+CREATE TABLE incidents(
+    incident_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    alert_id uuid NOT NULL REFERENCES alerts(alert_id) ON DELETE RESTRICT,
+    incident_number varchar(50) UNIQUE NOT NULL,
+    title varchar(500),
+    severity varchar(20) CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    status varchar(20) CHECK (status IN ('open', 'investigating', 'resolved', 'closed')),
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE incident_updates(
+    update_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    incident_id uuid NOT NULL REFERENCES incidents(incident_id) ON DELETE CASCADE,
+    update_message text,
+    updated_by varchar(255),
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- Playlist Songs (with ordering)
-CREATE TABLE playlist_songs(
-    playlist_id uuid REFERENCES playlists(playlist_id) ON DELETE CASCADE,
-    song_id uuid REFERENCES songs(song_id) ON DELETE CASCADE,
-    position integer NOT NULL,
-    added_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    added_by uuid REFERENCES users(user_id) ON DELETE SET NULL,
-    PRIMARY KEY (playlist_id, song_id)
+CREATE TABLE incident_resolutions(
+    resolution_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    incident_id uuid NOT NULL REFERENCES incidents(incident_id) ON DELETE CASCADE,
+    resolution_notes text,
+    root_cause text,
+    resolved_by varchar(255),
+    resolved_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- User Following Artists
-CREATE TABLE user_artist_follows(
-    user_id uuid REFERENCES users(user_id) ON DELETE CASCADE,
-    artist_id uuid REFERENCES artists(artist_id) ON DELETE CASCADE,
-    followed_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, artist_id)
+CREATE TABLE post_mortems(
+    post_mortem_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    resolution_id uuid NOT NULL REFERENCES incident_resolutions(resolution_id) ON DELETE CASCADE,
+    document_url text,
+    lessons_learned text,
+    action_items text,
+    published_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- User Following Users
-CREATE TABLE user_follows(
-    follower_id uuid REFERENCES users(user_id) ON DELETE CASCADE,
-    following_id uuid REFERENCES users(user_id) ON DELETE CASCADE,
-    followed_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (follower_id, following_id),
-    CHECK (follower_id != following_id)
+CREATE TABLE team_members(
+    member_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_id uuid NOT NULL REFERENCES teams(team_id) ON DELETE CASCADE,
+    email varchar(255) NOT NULL,
+    role VARCHAR(100),
+    joined_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- User Playlist Follows
-CREATE TABLE user_playlist_follows(
-    user_id uuid REFERENCES users(user_id) ON DELETE CASCADE,
-    playlist_id uuid REFERENCES playlists(playlist_id) ON DELETE CASCADE,
-    followed_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, playlist_id)
+ALTER TABLE code_reviews
+    ADD COLUMN reviewer_member_id uuid REFERENCES team_members(member_id);
+
+CREATE TABLE deployment_approvals(
+    approval_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    deployment_id uuid NOT NULL REFERENCES deployments(deployment_id) ON DELETE CASCADE,
+    approver_member_id uuid NOT NULL REFERENCES team_members(member_id),
+    approved_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    approval_status varchar(20) CHECK (approval_status IN ('approved', 'rejected'))
 );
 
--- Listening History
-CREATE TABLE listening_history(
-    history_id bigserial PRIMARY KEY,
-    user_id uuid NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    song_id uuid NOT NULL REFERENCES songs(song_id) ON DELETE CASCADE,
-    played_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    duration_played integer,
-    completed boolean DEFAULT FALSE,
-    device_type varchar(50),
-    location_country char(2)
+CREATE TABLE incident_assignments(
+    assignment_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    incident_id uuid NOT NULL REFERENCES incidents(incident_id) ON DELETE CASCADE,
+    assigned_member_id uuid NOT NULL REFERENCES team_members(member_id),
+    assigned_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    role_in_incident varchar(100)
 );
 
--- User Song Likes
-CREATE TABLE user_song_likes(
-    user_id uuid REFERENCES users(user_id) ON DELETE CASCADE,
-    song_id uuid REFERENCES songs(song_id) ON DELETE CASCADE,
-    liked_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, song_id)
+CREATE TABLE tags(
+    tag_id serial PRIMARY KEY,
+    tag_name varchar(100) UNIQUE NOT NULL,
+    color varchar(7)
 );
 
--- User Album Reviews
-CREATE TABLE album_reviews(
-    review_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id uuid NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    album_id uuid NOT NULL REFERENCES albums(album_id) ON DELETE CASCADE,
-    rating integer CHECK (rating >= 1 AND rating <= 5),
-    review_text text,
-    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    helpful_count integer DEFAULT 0,
-    UNIQUE (user_id, album_id)
+CREATE TABLE project_tags(
+    project_id uuid REFERENCES projects(project_id) ON DELETE CASCADE,
+    tag_id integer REFERENCES tags(tag_id) ON DELETE CASCADE,
+    PRIMARY KEY (project_id, tag_id)
 );
 
--- User Devices
-CREATE TABLE user_devices(
-    device_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id uuid NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    device_name varchar(100),
-    device_type varchar(50),
-    last_active timestamp DEFAULT CURRENT_TIMESTAMP,
-    is_active boolean DEFAULT TRUE
+CREATE TABLE commit_tags(
+    commit_id uuid REFERENCES commits(commit_id) ON DELETE CASCADE,
+    tag_id integer REFERENCES tags(tag_id) ON DELETE CASCADE,
+    PRIMARY KEY (commit_id, tag_id)
 );
 
--- Queue (Current playback queue)
-CREATE TABLE user_queue(
-    queue_id bigserial PRIMARY KEY,
-    user_id uuid NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    song_id uuid NOT NULL REFERENCES songs(song_id) ON DELETE CASCADE,
-    position integer NOT NULL,
-    added_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (user_id, position)
+CREATE TABLE incident_tags(
+    incident_id uuid REFERENCES incidents(incident_id) ON DELETE CASCADE,
+    tag_id integer REFERENCES tags(tag_id) ON DELETE CASCADE,
+    PRIMARY KEY (incident_id, tag_id)
 );
 
--- Indexes for performance
-CREATE INDEX idx_users_email ON users(email);
+-- Indexes
+CREATE INDEX idx_teams_org ON teams(org_id);
 
-CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_projects_team ON projects(team_id);
 
-CREATE INDEX idx_songs_album ON songs(album_id);
+CREATE INDEX idx_repos_project ON repositories(project_id);
 
-CREATE INDEX idx_albums_artist ON albums(artist_id);
+CREATE INDEX idx_branches_repo ON branches(repo_id);
 
-CREATE INDEX idx_listening_history_user ON listening_history(user_id);
+CREATE INDEX idx_commits_branch ON commits(branch_id);
 
-CREATE INDEX idx_listening_history_song ON listening_history(song_id);
+CREATE INDEX idx_prs_source ON pull_requests(source_branch_id);
 
-CREATE INDEX idx_listening_history_played_at ON listening_history(played_at);
+CREATE INDEX idx_prs_target ON pull_requests(target_branch_id);
 
-CREATE INDEX idx_playlist_songs_playlist ON playlist_songs(playlist_id);
+CREATE INDEX idx_reviews_pr ON code_reviews(pr_id);
 
-CREATE INDEX idx_user_subscriptions_user ON user_subscriptions(user_id);
+CREATE INDEX idx_builds_commit ON builds(commit_id);
 
-CREATE INDEX idx_song_artists_artist ON song_artists(artist_id);
+CREATE INDEX idx_artifacts_build ON build_artifacts(build_id);
 
--- Some useful views
-CREATE VIEW popular_songs AS
-SELECT
-    s.song_id,
-    s.song_title,
-    a.artist_name,
-    s.play_count,
-    COUNT(DISTINCT usl.user_id) AS like_count
-FROM
-    songs s
-    JOIN song_artists sa ON s.song_id = sa.song_id
-    JOIN artists a ON sa.artist_id = a.artist_id
-    LEFT JOIN user_song_likes usl ON s.song_id = usl.song_id
-GROUP BY
-    s.song_id,
-    s.song_title,
-    a.artist_name,
-    s.play_count
-ORDER BY
-    s.play_count DESC;
+CREATE INDEX idx_test_runs_build ON test_runs(build_id);
 
-CREATE VIEW user_listening_stats AS
-SELECT
-    u.user_id,
-    u.username,
-    COUNT(lh.history_id) AS total_plays,
-    COUNT(DISTINCT lh.song_id) AS unique_songs,
-    SUM(lh.duration_played) AS total_listen_time_seconds
-FROM
-    users u
-    LEFT JOIN listening_history lh ON u.user_id = lh.user_id
-GROUP BY
-    u.user_id,
-    u.username;
+CREATE INDEX idx_test_cases_run ON test_cases(test_run_id);
+
+CREATE INDEX idx_environments_project ON environments(project_id);
+
+CREATE INDEX idx_deployments_artifact ON deployments(artifact_id);
+
+CREATE INDEX idx_deployments_env ON deployments(env_id);
+
+CREATE INDEX idx_logs_deployment ON deployment_logs(deployment_id);
+
+CREATE INDEX idx_metrics_deployment ON monitoring_metrics(deployment_id);
+
+CREATE INDEX idx_alerts_metric ON alerts(metric_id);
+
+CREATE INDEX idx_incidents_alert ON incidents(alert_id);
+
+CREATE INDEX idx_updates_incident ON incident_updates(incident_id);
+
+CREATE INDEX idx_resolutions_incident ON incident_resolutions(incident_id);
+
+CREATE INDEX idx_postmortems_resolution ON post_mortems(resolution_id);
 

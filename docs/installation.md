@@ -18,11 +18,10 @@ pip install wizerd
 ```bash
 git clone https://github.com/Pork0594/wizerd.git
 cd wizerd
-pip install -r requirements.txt
 pip install -e .
 ```
 
-Editable installs (and regular `pip install .`) run a build hook that executes `npm ci` inside `wizerd/layout/` and adds the resulting `node_modules` to the package. If you plan to run the CLI straight from the repository without installing it, run `npm ci` manually inside `wizerd/layout/` first so Node can resolve `elkjs`.
+Editable installs run a build hook that executes `npm ci` inside `wizerd/layout/` and bundles the resulting `node_modules` into the package.
 
 ## Verify Installation
 
@@ -40,7 +39,7 @@ cd wizerd
 pip install -e ".[dev]"
 ```
 
-The editable install takes care of `npm ci` automatically. Use `WIZERD_SKIP_NPM_CI=1` only if you have already populated `node_modules` (for example via a cached artifact) and want to skip the automatic install. Without the bundled dependencies, the ELK-backed layout engine will fail to import `elkjs`.
+This installs pytest, ruff, mypy, and other dev dependencies. The editable install handles `npm ci` automatically.
 
 This installs:
 - `pytest` — Testing framework

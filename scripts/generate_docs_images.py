@@ -133,7 +133,7 @@ def main():
     generated = []
 
     # Hero Image
-    generated.extend(generate_sample(HERO_SCHEMA_PATH, "hero-image", "default-dark", "standard", ["--color-by-trunk"]))
+    generated.extend(generate_sample(HERO_SCHEMA_PATH, "hero-image", "default-dark", "compact", ["--color-by-trunk"]))
 
     # Key theme showcases
     for theme in THEMES:
