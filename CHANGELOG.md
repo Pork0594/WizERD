@@ -2,6 +2,25 @@
 
 <!-- version list -->
 
+## v0.3.1 (2026-03-02)
+
+### Bug Fixes
+
+- Remove unused import
+  ([`bf85c37`](https://github.com/Pork0594/WizERD/commit/bf85c37e91b1ed3268832dfd7aceef230061a80c))
+
+- Update theme system to use config file not separate custom theme config file
+  ([`4882a19`](https://github.com/Pork0594/WizERD/commit/4882a193f66cfd45b9416f112ace7e744bd8e411))
+
+### Documentation
+
+- Add reference to docs in readme file
+  ([`a348d97`](https://github.com/Pork0594/WizERD/commit/a348d975e077d7704ff1c2d9aec7b5c0e00ebd50))
+
+- Update documentation to fit latest config options and add contributing file
+  ([`ffbc8bd`](https://github.com/Pork0594/WizERD/commit/ffbc8bda8d99e1ced3a7d1160ab62792ba9454e4))
+
+
 ## v0.3.0 (2026-03-01)
 
 ### Features
