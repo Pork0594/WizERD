@@ -1,23 +1,19 @@
 # WizERD
 
-[![CI](https://github.com/Pork0594/WizERD/actions/workflows/ci.yml/badge.svg)](https://github.com/Pork0594/WizERD/actions) [![PyPI Version](https://img.shields.io/pypi/v/wizerd.svg)](https://pypi.org/project/wizerd/) [![Python Versions](https://img.shields.io/pypi/pyversions/wizerd.svg)](https://pypi.org/project/wizerd/) [![License](https://img.shields.io/pypi/l/wizerd.svg)](https://github.com/Pork0594/WizERD/blob/main/LICENSE)
+[![CI](https://github.com/Pork0594/WizERD/actions/workflows/ci.yml/badge.svg)](https://github.com/Pork0594/WizERD/actions)
+[![PyPI Version](https://img.shields.io/pypi/v/wizerd.svg)](https://pypi.org/project/wizerd/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/wizerd.svg)](https://pypi.org/project/wizerd/)
+[![License](https://img.shields.io/pypi/l/wizerd.svg)](https://github.com/Pork0594/WizERD/blob/main/LICENSE)
 
-WizERD is the best automated ER diagram generator for postgres databases. It generates beautiful, readable ER diagrams from PostgreSQL schema dumps. Point it at a pg_dump file, run the CLI, get a perfectly organized SVG diagram, no manual interaction required.
+**WizERD** generates beautiful, readable ER diagrams from PostgreSQL schema dumps. Point it at a `pg_dump` file and get a perfectly organized SVG — no manual layout, no line mess, no overlap. Ever.
 
 ![WizERD Output](docs/images/sample-hero-image.png)
 
-## Quick Start
-
-```bash
-pip install wizerd
-wizerd generate schema.sql -o diagram.svg
-```
-
-Point it at a PostgreSQL `pg_dump` or `pg_dumpall` output.
+---
 
 ## Why WizERD?
 
-Most ER diagram generators produce unreadable "line messes" with small or large schemas. WizERD uses the ELK layout algorithm to minimize edge crossings and guarantees zero table or line overlap — your diagrams stay navigable at any scale.
+Most ER diagram tools produce unreadable tangles the moment your schema grows past a handful of tables. WizERD uses the [ELK layout engine](https://eclipse.dev/elk/) to guarantee zero overlap and minimize edge crossings at any scale.
 
 - **Zero overlap** — tables never render on top of each other
 - **Smart routing** — orthogonal edges with minimal crossings
@@ -26,14 +22,22 @@ Most ER diagram generators produce unreadable "line messes" with small or large 
 - **Column details** — shows data types, PK/FK markers
 - **CI-friendly** — runs unattended in pipelines or scripts
 
+
 ## Installation
 
 ### Requirements
 
 - Python 3.9+
-- Node.js 18+ (for the ELK layout engine)
+- Node.js 18+ *(used by the ELK layout engine)*
 
-### From PyPI
+### Homebrew (macOS)
+
+```bash
+brew tap Pork0594/WizERD
+brew install wizerd
+```
+
+### pip
 
 ```bash
 pip install wizerd
@@ -48,12 +52,21 @@ pip install -e ".[dev]"
 cd wizerd/layout && npm ci && cd ../..
 ```
 
-## Documentation
-See our [documentation](docs/README.md) for a description of all features, installation and usage instructions.
+---
 
-## Overview
+## Quick Start
 
-### Basic
+```bash
+wizerd generate schema.sql -o diagram.svg
+```
+
+Point it at a `pg_dump` or `pg_dumpall` output and you're done.
+
+---
+
+## Usage
+
+### Generate a Diagram
 
 ```bash
 wizerd generate schema.sql -o diagram.svg
@@ -61,8 +74,10 @@ wizerd generate schema.sql -o diagram.svg
 
 ### Themes
 
+WizERD ships with 13 built-in themes.
+
 ```bash
-# List all themes
+# See all available themes
 wizerd themes
 
 # Apply a theme
@@ -71,7 +86,7 @@ wizerd generate schema.sql -t dracula
 wizerd generate schema.sql -t nord
 ```
 
-### Spacing
+### Layout Density
 
 ```bash
 wizerd generate schema.sql -w compact    # Tight layout
@@ -79,44 +94,50 @@ wizerd generate schema.sql -w standard   # Default
 wizerd generate schema.sql -w spacious   # More breathing room
 ```
 
-### Show Foreign Key Names
+### Foreign Key Labels
 
 ```bash
-wizerd generate schema.sql -o diagram.svg --show-edge-labels
+wizerd generate schema.sql --show-edge-labels
 ```
 
 ### Color by Relationship Target
 
+Highlights edges by which table they point to, making complex schemas easier to trace.
+
 ```bash
-wizerd generate schema.sql -o diagram.svg --color-by-trunk
+wizerd generate schema.sql --color-by-trunk
 ```
 
-### Debugging
+### Parse & Inspect
 
-Parse and inspect your schema:
+Useful for debugging your schema or piping into other tools.
 
 ```bash
 wizerd parse schema.sql > schema.json
 ```
 
-### Configuration
+---
 
-Create a config file:
+## Configuration
+
+### Generate a Config File
 
 ```bash
-wizerd init            # Creates .wizerd.yaml
-wizerd init -t full    # Full template with all options
+wizerd init             # Creates .wizerd.yaml with common options
+wizerd init -t full     # Full template with every available option
 ```
 
-Config precedence (later overrides earlier):
+### Config Precedence
 
-1. Defaults
-2. `~/.wizerd.yaml` (home directory)
-3. `.wizerd.yaml` (project directory)
-4. `--config` file
-5. CLI arguments
+Settings are resolved in this order, with later sources taking priority:
 
-Environment variables also work:
+1. Built-in defaults
+2. `~/.wizerd.yaml` — home directory global config
+3. `.wizerd.yaml` — project directory config
+4. `--config <path>` — explicit config file
+5. CLI flags — always win
+
+### Environment Variables
 
 ```bash
 export WIZERD_THEME=light
@@ -124,13 +145,13 @@ export WIZERD_OUTPUT=diagram.svg
 export WIZERD_SPACING_PROFILE=compact
 ```
 
-Validate your config:
+### Validate Your Config
 
 ```bash
 wizerd validate .wizerd.yaml
 ```
 
-Show default values:
+### Show Defaults
 
 ```bash
 wizerd defaults
@@ -138,36 +159,44 @@ wizerd defaults --format json
 wizerd defaults --format env
 ```
 
+---
+
 ## Configuration Reference
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `--output`, `-o` | path | `diagram.svg` | Output file path |
-| `--theme`, `-t` | string | `default-dark` | Theme name |
-| `--spacing-profile`, `-w` | string | `standard` | Layout density: `compact`, `standard`, `spacious` |
-| `--show-edge-labels`, `-l` | bool | `false` | Show FK names on connector lines |
-| `--color-by-trunk`, `-e` | bool | `false` | Color edges by FK target table |
-| `--config`, `-c` | path | — | Config file path |
+| Option | Short | Type | Default | Description |
+|---|---|---|---|---|
+| `--output` | `-o` | path | `diagram.svg` | Output file path |
+| `--theme` | `-t` | string | `default-dark` | Theme name (run `wizerd themes` for options) |
+| `--spacing-profile` | `-w` | string | `standard` | Layout density: `compact`, `standard`, `spacious` |
+| `--show-edge-labels` | `-l` | bool | `false` | Show FK constraint names on edges |
+| `--color-by-trunk` | `-e` | bool | `false` | Color edges by FK target table |
+| `--config` | `-c` | path | — | Explicit path to a config file |
+
+---
 
 ## Example Schemas
 
 WizERD ships with example schemas in `dev/dumps/examples/`:
 
 | File | Tables | Description |
-|------|--------|-------------|
-| `simple_schema.sql` | 2 | Users and posts |
+|---|---|---|
+| `simple_schema.sql` | 2 | Users and posts — good for getting started |
 | `schema.sql` | 20+ | Music streaming platform |
-| `large_schema.sql` | 50+ | Complex relationships |
+| `large_schema.sql` | 50+ | Complex multi-domain schema |
+
+---
 
 ## Development
 
 ```bash
-make install-all   # Set up venv, Python deps, Node.js
-make check         # lint + typecheck + tests
-make example       # Generate demo diagram
+make install-all   # Set up venv, Python deps, and Node.js
+make check         # Lint + typecheck + tests
+make example       # Generate a demo diagram
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
+
+---
 
 ## License
 

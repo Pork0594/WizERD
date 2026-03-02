@@ -7,6 +7,13 @@ WizERD supports multiple installation methods. Choose the one that fits your wor
 - Python 3.9 or higher
 - Node.js 18+ (for the layout engine)
 
+## Homebrew (macOS)
+
+```bash
+brew tap Pork0594/WizERD
+brew install wizerd
+```
+
 ## Install from PyPI
 
 ```bash
