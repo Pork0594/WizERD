@@ -23,7 +23,7 @@ wizerd r <schema> [options]
 - `-l, --show-edge-labels` — Render FK names along connector lines
 - `-w, --spacing-profile [compact|standard|spacious]` — Spacing preset (default: standard)
 - `-e, --color-by-trunk` — Use unique color per FK target
-- `-t, --theme TEXT` — Theme name or path (default: default-dark)
+- `-t, --theme TEXT` — Built-in theme name
 - `-c, --config PATH` — Path to config file (YAML or JSON)
 
 **Examples:**

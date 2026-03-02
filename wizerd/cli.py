@@ -148,7 +148,7 @@ THEME_OPTION = typer.Option(
     "default-dark",
     "--theme",
     "-t",
-    help="Theme name or path",
+    help="Theme name",
 )
 
 CONFIG_OPTION = typer.Option(

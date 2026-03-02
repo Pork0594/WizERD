@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from pathlib import Path
 from typing import Any
-
-import yaml  # type: ignore[import-untyped]
 
 from wizerd.theme import Theme, ThemeRegistry
 
@@ -46,50 +43,6 @@ def list_builtin_themes() -> dict[str, Theme]:
     return ThemeRegistry.list_themes()
 
 
-def load_theme_from_file(path: Path) -> Theme:
-    """Load a theme from a JSON or YAML file.
-
-    Args:
-        path: Path to JSON theme file
-
-    Returns:
-        The loaded Theme
-
-    Raises:
-        ValueError: If file cannot be read or parsed
-    """
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            raw = f.read()
-
-        if path.suffix.lower() in {".yaml", ".yml"}:
-            data = yaml.safe_load(raw)
-        else:
-            data = json.loads(raw)
-    except FileNotFoundError as exc:
-        raise ValueError(f"Theme file not found: {path}") from exc
-    except (json.JSONDecodeError, yaml.YAMLError) as exc:
-        raise ValueError(f"Invalid JSON in theme file: {exc}") from exc
-
-    if not isinstance(data, dict):
-        raise ValueError("Theme file must contain a mapping")
-
-    return Theme.from_dict(data)
-
-
-def _looks_like_file_path(value: str) -> bool:
-    """Check if a string looks like a file path."""
-    if not value:
-        return False
-    return (
-        value.startswith("/")
-        or value.startswith("./")
-        or value.startswith("../")
-        or value.endswith(".json")
-        or ":" in value.split("/")[0]
-    )
-
-
 def load_theme(
     theme_name: str | None = None,
     *,
@@ -100,12 +53,11 @@ def load_theme(
 
     Resolution order:
     1. Use inline theme definition (if provided)
-    2. Load from file when theme_name looks like a path
-    3. Load built-in theme by name (if provided)
-    4. Fallback to the default theme
+    2. Load built-in theme by name (if provided)
+    3. Fallback to the default theme
 
     Args:
-        theme_name: Name of built-in theme (e.g., 'default-dark') or path to theme file
+        theme_name: Name of built-in theme (e.g., 'default-dark', 'light')
         theme_inline: Inline theme definition (same schema as theme JSON)
         theme_overrides: Dictionary of theme values to override
 
@@ -113,21 +65,14 @@ def load_theme(
         The resolved Theme
 
     Raises:
-        ValueError: If referenced theme files are missing or inline definitions are invalid
+        ValueError: If theme name is not found or inline definition is invalid
     """
     theme: Theme
 
     if theme_inline is not None:
         theme = Theme.from_dict(theme_inline)
     elif theme_name:
-        if _looks_like_file_path(theme_name):
-            theme_file_path = Path(theme_name)
-            if theme_file_path.exists():
-                theme = load_theme_from_file(theme_file_path)
-            else:
-                raise ValueError(f"Theme file not found: {theme_file_path}")
-        else:
-            theme = get_builtin_theme(theme_name)
+        theme = get_builtin_theme(theme_name)
     else:
         theme = get_builtin_theme("default-dark")
 
@@ -135,18 +80,6 @@ def load_theme(
         theme = theme.merge(theme_overrides)
 
     return theme
-
-
-def export_theme(theme: Theme, output_path: Path) -> None:
-    """Export a theme to a JSON file.
-
-    Args:
-        theme: Theme to export
-        output_path: Path to write JSON file
-    """
-    data = theme.to_dict()
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
 
 
 COLOR_OVERRIDE_MAPPING: dict[str, tuple[str, str]] = {

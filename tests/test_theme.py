@@ -2,20 +2,14 @@
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
-
 import pytest
-import yaml
 
 from wizerd.theme import Theme, ThemeColors
 from wizerd.theme.loader import (
-    _looks_like_file_path,
     cli_overrides_to_dict,
     get_builtin_theme,
     list_builtin_themes,
     load_theme,
-    load_theme_from_file,
 )
 
 
@@ -103,48 +97,6 @@ class TestThemePresets:
 class TestThemeLoader:
     """Cover the different theme loading code paths."""
 
-    def test_load_theme_from_file(self, tmp_path):
-        """Loading from JSON should hydrate a Theme with those values."""
-        theme_data = {
-            "name": "file-theme",
-            "description": "From file",
-            "is_dark": True,
-            "colors": {"canvas_background": "#123456"},
-        }
-        theme_file = tmp_path / "theme.json"
-        theme_file.write_text(json.dumps(theme_data))
-
-        theme = load_theme_from_file(theme_file)
-        assert theme.name == "file-theme"
-        assert theme.colors.canvas_background == "#123456"
-
-    def test_load_theme_from_yaml_file(self, tmp_path):
-        """YAML theme files should also be supported."""
-        theme_data = {
-            "name": "yaml-theme",
-            "description": "YAML",
-            "colors": {"canvas_background": "#abcdef"},
-        }
-        theme_file = tmp_path / "theme.yaml"
-        theme_file.write_text(yaml.dump(theme_data))
-
-        theme = load_theme_from_file(theme_file)
-        assert theme.name == "yaml-theme"
-        assert theme.colors.canvas_background == "#abcdef"
-
-    def test_load_theme_from_file_not_found(self):
-        """Missing JSON files should raise a ValueError with context."""
-        with pytest.raises(ValueError, match="Theme file not found"):
-            load_theme_from_file(Path("/nonexistent/theme.json"))
-
-    def test_load_theme_from_file_invalid_json(self, tmp_path):
-        """Invalid JSON should surface a ValueError rather than crashing."""
-        theme_file = tmp_path / "bad.json"
-        theme_file.write_text("{invalid")
-
-        with pytest.raises(ValueError, match="Invalid JSON"):
-            load_theme_from_file(theme_file)
-
     def test_load_theme_by_name(self):
         """`load_theme` should resolve built-in names when no file is given."""
         theme = load_theme(theme_name="light")
@@ -157,39 +109,21 @@ class TestThemeLoader:
         )
         assert theme.colors.canvas_background == "#ff0000"
 
-    def test_load_theme_file_not_found(self):
-        """File-looking names should still throw when the file is absent."""
-        with pytest.raises(ValueError, match="Theme file not found"):
-            load_theme(theme_name="/nonexistent.json")
-
     def test_load_theme_default(self):
         """No arguments should yield the default-dark theme."""
         theme = load_theme()
         assert theme.name == "default-dark"
 
-
-class TestPathDetection:
-    """Verify heuristics that decide whether a string is a path."""
-
-    def test_looks_like_file_path_absolute(self):
-        """Absolute paths should be treated as file references."""
-        assert _looks_like_file_path("/path/to/theme.json") is True
-        assert _looks_like_file_path("/tmp/theme.json") is True
-
-    def test_looks_like_file_path_relative(self):
-        """Relative paths should also be considered file references."""
-        assert _looks_like_file_path("./theme.json") is True
-        assert _looks_like_file_path("../theme.json") is True
-
-    def test_looks_like_file_path_json_suffix(self):
-        """A .json suffix alone should trigger file detection."""
-        assert _looks_like_file_path("theme.json") is True
-
-    def test_looks_like_file_path_not(self):
-        """Preset names should not be mistaken for file paths."""
-        assert _looks_like_file_path("default-dark") is False
-        assert _looks_like_file_path("light") is False
-        assert _looks_like_file_path("monochrome") is False
+    def test_load_theme_inline(self):
+        """Inline theme definition should be used directly."""
+        inline_theme = {
+            "name": "inline-theme",
+            "is_dark": True,
+            "colors": {"canvas_background": "#123456"},
+        }
+        theme = load_theme(theme_inline=inline_theme)
+        assert theme.name == "inline-theme"
+        assert theme.colors.canvas_background == "#123456"
 
 
 class TestCLIOverrides:
