@@ -15,10 +15,6 @@ wizerd generate schema.sql -o diagram.svg
 
 Point it at a PostgreSQL `pg_dump` or `pg_dumpall` output.
 
-## Documentation
-
-See the `docs/` folder for detailed guides on configuration, themes, spacing, and more.
-
 ## Why WizERD?
 
 Most ER diagram generators produce unreadable "line messes" with large schemas. WizERD uses the ELK layout algorithm to minimize edge crossings and guarantees zero table overlap — your diagrams stay navigable at any scale.
@@ -54,7 +50,10 @@ pip install -e ".[dev]"
 cd wizerd/layout && npm ci && cd ../..
 ```
 
-## Usage
+## Documentation
+See our full [documentation](docs/README.md) a full description of all features, installation and usage instructions.
+
+## Overview
 
 ### Basic
 
