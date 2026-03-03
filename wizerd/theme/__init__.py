@@ -33,6 +33,7 @@ class ThemeDimensions:
     table_min_width: float = 220.0
     table_max_width: float = 460.0
     table_side_padding: float = 28.0
+    marker_size: float = 10.0
 
 
 @dataclass
@@ -113,6 +114,7 @@ class Theme:
             corner_radius=self.dimensions.corner_radius,
             table_stroke_width=self.dimensions.table_stroke_width,
             table_side_padding=self.dimensions.table_side_padding,
+            marker_size=self.dimensions.marker_size,
             edge_width=self.edges.edge_width,
             edge_trunk_width=self.edges.edge_trunk_width,
             edge_corner_radius=self.edges.edge_corner_radius,
@@ -155,6 +157,7 @@ class Theme:
                 "table_min_width": self.dimensions.table_min_width,
                 "table_max_width": self.dimensions.table_max_width,
                 "table_side_padding": self.dimensions.table_side_padding,
+                "marker_size": self.dimensions.marker_size,
             },
             "edges": {
                 "edge_color": self.edges.edge_color,
@@ -215,6 +218,7 @@ class Theme:
             table_side_padding=dim_data.get(
                 "table_side_padding", ThemeDimensions().table_side_padding
             ),
+            marker_size=dim_data.get("marker_size", ThemeDimensions().marker_size)
         )
 
         edge_data = data.get("edges", {})

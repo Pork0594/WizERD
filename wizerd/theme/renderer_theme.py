@@ -45,6 +45,7 @@ class RendererTheme:
     table_min_width: float = 220.0
     table_max_width: float = 460.0
     table_side_padding: float = 28.0
+    marker_size: float = 10.0
     edge_width: float = 2.0
     edge_trunk_width: float = 3.0
     edge_corner_radius: float = 20.0

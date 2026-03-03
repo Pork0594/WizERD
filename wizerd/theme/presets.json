@@ -33,7 +33,8 @@
       "table_stroke_width": 1.2,
       "table_min_width": 220.0,
       "table_max_width": 460.0,
-      "table_side_padding": 28.0
+      "table_side_padding": 28.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#7dd3fc",
@@ -94,7 +95,8 @@
       "table_stroke_width": 1.0,
       "table_min_width": 200.0,
       "table_max_width": 400.0,
-      "table_side_padding": 24.0
+      "table_side_padding": 24.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#0369a1",
@@ -150,7 +152,8 @@
       "table_stroke_width": 1.5,
       "table_min_width": 210.0,
       "table_max_width": 420.0,
-      "table_side_padding": 26.0
+      "table_side_padding": 26.0,
+      "marker_size": 7.3
     },
     "edges": {
       "edge_color": "#c0c0c0",
@@ -206,7 +209,8 @@
       "table_stroke_width": 1.3,
       "table_min_width": 215.0,
       "table_max_width": 440.0,
-      "table_side_padding": 27.0
+      "table_side_padding": 27.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#2aa198",
@@ -262,7 +266,8 @@
       "table_stroke_width": 2.0,
       "table_min_width": 250.0,
       "table_max_width": 500.0,
-      "table_side_padding": 32.0
+      "table_side_padding": 32.0,
+      "marker_size": 9.3
     },
     "edges": {
       "edge_color": "#00ffff",
@@ -318,7 +323,8 @@
       "table_stroke_width": 1.2,
       "table_min_width": 220.0,
       "table_max_width": 460.0,
-      "table_side_padding": 28.0
+      "table_side_padding": 28.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#38bdf8",
@@ -374,7 +380,8 @@
       "table_stroke_width": 1.3,
       "table_min_width": 220.0,
       "table_max_width": 450.0,
-      "table_side_padding": 28.0
+      "table_side_padding": 28.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#4ade80",
@@ -430,7 +437,8 @@
       "table_stroke_width": 1.2,
       "table_min_width": 220.0,
       "table_max_width": 460.0,
-      "table_side_padding": 28.0
+      "table_side_padding": 28.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#fb923c",
@@ -486,7 +494,8 @@
       "table_stroke_width": 1.0,
       "table_min_width": 180.0,
       "table_max_width": 350.0,
-      "table_side_padding": 20.0
+      "table_side_padding": 20.0,
+      "marker_size": 7.3
     },
     "edges": {
       "edge_color": "#000000",
@@ -537,7 +546,8 @@
       "table_stroke_width": 1.0,
       "table_min_width": 200.0,
       "table_max_width": 420.0,
-      "table_side_padding": 24.0
+      "table_side_padding": 24.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#5c5144",
@@ -593,7 +603,8 @@
       "table_stroke_width": 1.0,
       "table_min_width": 200.0,
       "table_max_width": 400.0,
-      "table_side_padding": 24.0
+      "table_side_padding": 24.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#00ff00",
@@ -644,7 +655,8 @@
       "table_stroke_width": 1.2,
       "table_min_width": 210.0,
       "table_max_width": 430.0,
-      "table_side_padding": 26.0
+      "table_side_padding": 26.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#88c0d0",
@@ -700,7 +712,8 @@
       "table_stroke_width": 1.2,
       "table_min_width": 215.0,
       "table_max_width": 440.0,
-      "table_side_padding": 26.0
+      "table_side_padding": 26.0,
+      "marker_size": 8.0
     },
     "edges": {
       "edge_color": "#8be9fd",

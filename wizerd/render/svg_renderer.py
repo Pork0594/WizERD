@@ -215,11 +215,10 @@ class SVGRenderer:
         )
         group.add(header_rect)
         header_text = node.table_name if not table else table.name
-        marker_size = theme.font_size_secondary
         group.add(
             dwg.text(
                 header_text,
-                insert=(node.x + theme.table_side_padding + (marker_size if not isView else 0), node.y + theme.header_height / 2),
+                insert=(node.x + theme.table_side_padding + (theme.marker_size if not isView else 0), node.y + theme.header_height / 2),
                 dominant_baseline="middle",
                 font_size=f"{theme.font_size_header}px",
                 font_family=theme.font_family,
@@ -286,12 +285,11 @@ class SVGRenderer:
             elif column.name in fk_columns:
                 marker_color = theme.fk_marker
 
-            marker_size = theme.font_size_secondary
             if marker_color:
                 group.add(
                     dwg.circle(
-                        center=(node.x + (theme.table_side_padding + marker_size) / 2, row_top + theme.row_height / 2),
-                        r=marker_size/2,
+                        center=(node.x + (theme.table_side_padding + theme.marker_size) / 2, row_top + theme.row_height / 2),
+                        r=theme.marker_size/2,
                         fill=marker_color,
                     )
                 )
@@ -299,7 +297,7 @@ class SVGRenderer:
             group.add(
                 dwg.text(
                     column.name,
-                    insert=(node.x + theme.table_side_padding + marker_size, row_top + theme.row_height / 2),
+                    insert=(node.x + theme.table_side_padding + theme.marker_size, row_top + theme.row_height / 2),
                     dominant_baseline="middle",
                     font_size=f"{theme.font_size_body}px",
                     font_family=theme.font_family,
@@ -340,8 +338,8 @@ class SVGRenderer:
 
                 group.add(
                     dwg.circle(
-                        center=(node.x + (theme.table_side_padding + marker_size) / 2, row_top + theme.row_height / 2),
-                        r=marker_size/2,
+                        center=(node.x + (theme.table_side_padding + theme.marker_size) / 2, row_top + theme.row_height / 2),
+                        r=theme.marker_size/2,
                         fill=theme.idx_marker,
                     )
                 )
@@ -349,7 +347,7 @@ class SVGRenderer:
                 group.add(
                     dwg.text(
                         label,
-                        insert=(node.x + theme.table_side_padding + marker_size, row_top + theme.row_height / 2),
+                        insert=(node.x + theme.table_side_padding + theme.marker_size, row_top + theme.row_height / 2),
                         dominant_baseline="middle",
                         font_size=f"{theme.font_size_secondary}px",
                         font_family=theme.font_family,
@@ -374,8 +372,8 @@ class SVGRenderer:
 
                 group.add(
                     dwg.circle(
-                        center=(node.x + (theme.table_side_padding + marker_size) / 2, row_top + theme.row_height / 2),
-                        r=marker_size/2,
+                        center=(node.x + (theme.table_side_padding + theme.marker_size) / 2, row_top + theme.row_height / 2),
+                        r=theme.marker_size/2,
                         fill=theme.seq_marker,
                     )
                 )
