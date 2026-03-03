@@ -19,7 +19,8 @@ Most ER diagram tools produce unreadable tangles the moment your schema grows pa
 - **Smart routing** — orthogonal edges with minimal crossings
 - **13 built-in themes** — dark, light, monochrome, and more
 - **Flexible spacing** — compact, standard, or spacious
-- **Column details** — shows data types, PK/FK markers
+- **Comprehensive schema support** — includes tables, views, indexes, and sequences
+- **Column details** — shows data types and PK/FK/IDX/SEQ markers
 - **CI-friendly** — runs unattended in pipelines or scripts
 
 
@@ -170,6 +171,9 @@ wizerd defaults --format env
 | `--spacing-profile` | `-w` | string | `standard` | Layout density: `compact`, `standard`, `spacious` |
 | `--show-edge-labels` | `-l` | bool | `false` | Show FK constraint names on edges |
 | `--color-by-trunk` | `-e` | bool | `false` | Color edges by FK target table |
+| `--indexes` | — | bool | `false` | Include indexes in the diagram |
+| `--views` | — | bool | `false` | Include views as separate nodes |
+| `--sequences` | — | bool | `false` | Include sequences for auto-increment columns |
 | `--config` | `-c` | path | — | Explicit path to a config file |
 
 ---

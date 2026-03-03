@@ -91,6 +91,8 @@ Each table in the diagram includes:
 - **Columns** — Column name, data type, and constraints
 - **PK marker** — Primary key indicator (yellow star)
 - **FK marker** — Foreign key indicator (blue circle)
+- **IDX marker** — Index indicator (purple diamond, if enabled)
+- **SEQ marker** — Sequence indicator (green square, if enabled)
 - **Relationships** — Connectors showing foreign key relationships
 
 ## Next Steps

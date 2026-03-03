@@ -69,6 +69,9 @@ All CLI options map to environment variables:
 | `--show-edge-labels` | `WIZERD_SHOW_EDGE_LABELS` |
 | `--spacing-profile` | `WIZERD_SPACING_PROFILE` |
 | `--color-by-trunk` | `WIZERD_COLOR_BY_TRUNK` |
+| `--indexes` | `WIZERD_INDEXES` |
+| `--views` | `WIZERD_VIEWS` |
+| `--sequences` | `WIZERD_SEQUENCES` |
 | `--config` | `WIZERD_CONFIG` |
 
 Spacing environment variables for fine-grained control:
@@ -97,11 +100,14 @@ wizerd generate schema.sql
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `output` | string | `diagram.svg` | Output file path |
-| `theme` | string or dict | `default-dark` | Theme name (string) or [full theme definition](themes.md#custom-themes) (dict) |
+| `theme` | string or dict | `default-dark` | Theme name (string) or full theme definition (dict) |
 | `theme-overrides` | dict | — | Partial theme customizations (colors, typography, etc.) |
 | `show-edge-labels` | boolean | `false` | Show FK names on connectors |
 | `spacing-profile` | string | `compact, standard, spacious` | Spacing preset |
 | `color-by-trunk` | boolean | `false` | Color edges by FK target |
+| `indexes` | boolean | `false` | Include indexes in the diagram |
+| `views` | boolean | `false` | Include views as separate nodes |
+| `sequences` | boolean | `false` | Include sequences for auto-increment columns |
 
 ### Custom Spacing Keys (advanced)
 
@@ -109,12 +115,12 @@ If you need finer control than the `spacing-profile` presets provide, you can se
 
 | Key | Type | Default (standard) | Description |
 |-----|------|--------------------:|-------------|
-| `column_gap` | number | `360.0` | Horizontal gap between table columns (controls X-axis spacing) |
-| `row_gap` | number | `225.0` | Vertical gap between tables within a column (controls Y-axis spacing) |
-| `component_gap` | number | `570.0` | Gap between disconnected groups of tables |
-| `edge_to_node_gap` | number | `51.0` | Clearance between edges and table boxes |
-| `edge_gap` | number | `39.0` | Clearance between parallel edges (lane spacing) |
-| `margin` | number | `72.0` | Canvas margin applied on both axes |
+| `spacing.column_gap` | number | `360.0` | Horizontal gap between table columns (controls X-axis spacing) |
+| `spacing.row_gap` | number | `225.0` | Vertical gap between tables within a column (controls Y-axis spacing) |
+| `spacing.component_gap` | number | `570.0` | Gap between disconnected groups of tables |
+| `spacing.edge_to_node_gap` | number | `51.0` | Clearance between edges and table boxes |
+| `spacing.edge_gap` | number | `39.0` | Clearance between parallel edges (lane spacing) |
+| `spacing.margin` | number | `72.0` | Canvas margin applied on both axes |
 
 Example (YAML):
 
@@ -127,6 +133,81 @@ spacing:
 ```
 
 Use the canonical keys above when setting `spacing` in your config file or via environment variables. Legacy keys are not supported.
+
+## Theme Configuration
+
+You can customize the visual appearance of your diagrams by defining a custom theme or overriding specific properties of a built-in theme.
+
+- **`theme`**: Accepts a built-in theme name (e.g., `default-dark`) or a full theme definition object.
+- **`theme-overrides`**: Modifies specific values of the currently selected theme without defining everything from scratch.
+
+Both `theme` (when defined as an object) and `theme-overrides` share the same property tree. Use the dot notation below when writing your YAML/JSON config.
+
+### Colors
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `theme.colors.canvas_background` | string | Background color of the entire diagram |
+| `theme.colors.table_background` | string | Background color of the table body |
+| `theme.colors.table_border` | string | Border color of the table |
+| `theme.colors.table_header_bg` | string | Background color of the table header |
+| `theme.colors.table_header_text` | string | Text color for the table name |
+| `theme.colors.table_body_text` | string | Text color for column names and types |
+| `theme.colors.table_secondary_text`| string | Text color for secondary information (like type size) |
+| `theme.colors.zebra_row` | string | Background color for alternating rows |
+| `theme.colors.pk_marker` | string | Color of the Primary Key (PK) marker |
+| `theme.colors.fk_marker` | string | Color of the Foreign Key (FK) marker |
+| `theme.colors.idx_marker` | string | Color of the Index (IDX) marker |
+| `theme.colors.seq_marker` | string | Color of the Sequence (SEQ) marker |
+
+### Typography
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `theme.typography.font_family` | string | CSS font-family string (e.g., `'Inter', sans-serif`) |
+| `theme.typography.font_size_header` | number | Font size for the table name |
+| `theme.typography.font_size_body` | number | Font size for column names and types |
+| `theme.typography.font_size_secondary` | number | Font size for secondary text |
+| `theme.typography.font_size_edge_label`| number | Font size for relationship labels on edges |
+| `theme.typography.char_pixel_width` | number | Estimated pixel width of a character (used for layout calculations) |
+
+### Dimensions
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `theme.dimensions.canvas_padding` | number | Padding around the edge of the canvas |
+| `theme.dimensions.header_height` | number | Height of the table header |
+| `theme.dimensions.row_height` | number | Height of each column row |
+| `theme.dimensions.corner_radius` | number | Border radius for the table corners |
+| `theme.dimensions.table_stroke_width` | number | Width of the table border stroke |
+| `theme.dimensions.table_min_width` | number | Minimum width of a table |
+| `theme.dimensions.table_max_width` | number | Maximum width of a table before truncating text |
+| `theme.dimensions.table_side_padding` | number | Horizontal padding inside the table rows |
+| `theme.dimensions.marker_size` | number | Size of the PK/FK/IDX/SEQ markers |
+
+### Edges
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `theme.edges.edge_color` | string | Default color for relationship lines |
+| `theme.edges.edge_secondary` | string | Secondary color for relationships |
+| `theme.edges.edge_width` | number | Stroke width of relationship lines |
+| `theme.edges.edge_corner_radius` | number | Radius for the orthogonal bends in the lines |
+| `theme.edges.edge_color_palette` | list[str] | List of hex colors used when `color-by-trunk` is enabled |
+| `theme.edges.arrow_marker_id` | string | SVG marker ID for the edge arrow |
+
+### Example
+
+```yaml
+# .wizerd.yaml
+theme: default-dark
+theme-overrides:
+  colors:
+    canvas_background: "#1a1a2e"
+    table_header_bg: "#e94560"
+  typography:
+    font_family: "'JetBrains Mono', monospace"
+```
 
 ## Validating Configuration
 
@@ -161,6 +242,9 @@ spacing-profile: standard
 color-by-trunk: false
 theme: default-dark
 edge-color-mode: single
+indexes: false
+views: false
+sequences: false
 ```
 
 ## Config Templates
@@ -189,6 +273,9 @@ theme: default-dark
 show-edge-labels: false
 spacing-profile: standard
 color-by-trunk: false
+indexes: false
+views: false
+sequences: false
 ```
 
 ## Next Steps
