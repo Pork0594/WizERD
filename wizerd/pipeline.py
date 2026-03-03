@@ -104,7 +104,9 @@ def _schema_to_graph(
                 )
             )
 
-            referenced_tables = list(dict.fromkeys(view.referenced_tables)) if view.referenced_tables else []
+            referenced_tables = (
+                list(dict.fromkeys(view.referenced_tables)) if view.referenced_tables else []
+            )
             for ref_table in referenced_tables:
                 if ref_table in schema.tables:
                     graph.add_edge(
@@ -200,7 +202,11 @@ def _measure_table(
         for idx in table.indexes:
             unique_str = "unique " if idx.is_unique else ""
             cols_str = ", ".join(idx.columns) if idx.columns else ""
-            type_str = f"({idx.index_type}, {unique_str}idx)" if idx.index_type != "btree" or idx.is_unique else f"({idx.index_type} idx)"
+            type_str = (
+                f"({idx.index_type}, {unique_str}idx)"
+                if idx.index_type != "btree" or idx.is_unique
+                else f"({idx.index_type} idx)"
+            )
             label = f"{idx.name}({cols_str}) {type_str}".strip()
             longest = max(longest, len(label))
         for seq in table.sequences:

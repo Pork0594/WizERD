@@ -938,16 +938,16 @@ class DDLParser:
 
         schema_name, view_name, full_view_name, _ = view_name_result
 
-        full_name = f'{schema_name}.{view_name}' if schema_name else view_name
+        full_name = f"{schema_name}.{view_name}" if schema_name else view_name
 
         view_pos = text.upper().find(full_name.upper())
         if view_pos == -1:
             return None
 
-        after_name = text[view_pos + len(full_name):]
+        after_name = text[view_pos + len(full_name) :]
 
         definition = ""
-        select_match = re.search(r'^\s+AS\s+(SELECT\s+.+)', after_name, re.IGNORECASE | re.DOTALL)
+        select_match = re.search(r"^\s+AS\s+(SELECT\s+.+)", after_name, re.IGNORECASE | re.DOTALL)
         if select_match:
             definition = select_match.group(1).strip()
 
@@ -955,7 +955,7 @@ class DDLParser:
         columns = self._extract_select_columns(definition)
 
         return View(
-            name=full_name,
+            name=view_name,
             schema=schema_name,
             definition=definition,
             columns=columns,
@@ -988,17 +988,17 @@ class DDLParser:
         for col in select_part.split(","):
             col = col.strip()
 
-            col = re.sub(r'\s+AS\s+\w+', '', col, flags=re.IGNORECASE)
-            col = re.sub(r'\s+as\s+\w+', '', col)
+            col = re.sub(r"\s+AS\s+\w+", "", col, flags=re.IGNORECASE)
+            col = re.sub(r"\s+as\s+\w+", "", col)
 
-            if '(' in col:
-                func_match = re.match(r'(\w+)\(.*\)', col)
+            if "(" in col:
+                func_match = re.match(r"(\w+)\(.*\)", col)
                 if func_match:
                     col = func_match.group(1)
 
             col = col.strip()
-            if '.' in col:
-                col = col.split('.')[-1]
+            if "." in col:
+                col = col.split(".")[-1]
 
             if col:
                 columns.append(col)

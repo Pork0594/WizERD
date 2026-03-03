@@ -215,7 +215,7 @@ class Theme:
             table_side_padding=dim_data.get(
                 "table_side_padding", ThemeDimensions().table_side_padding
             ),
-            marker_size=dim_data.get("marker_size", ThemeDimensions().marker_size)
+            marker_size=dim_data.get("marker_size", ThemeDimensions().marker_size),
         )
 
         edge_data = data.get("edges", {})

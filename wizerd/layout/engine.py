@@ -195,7 +195,7 @@ class ElkLayoutEngine:
         children = []
         for node in graph.nodes.values():
             ports = []
-            
+
             ports.append(
                 {
                     "id": f"{node.table_name}::east",
@@ -212,7 +212,7 @@ class ElkLayoutEngine:
                     "layoutOptions": {"org.eclipse.elk.port.side": "WEST"},
                 }
             )
-            
+
             if node.column_anchors:
                 for col_name, y_offset in node.column_anchors.items():
                     ports.append(

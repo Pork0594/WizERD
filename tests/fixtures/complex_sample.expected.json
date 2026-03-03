@@ -29,7 +29,9 @@
           "name": "categories_name_check",
           "expression": "(char_length(name) > 0)"
         }
-      ]
+      ],
+      "indexes": [],
+      "sequences": []
     },
     "inventory.product_categories": {
       "name": "inventory.product_categories",
@@ -95,7 +97,9 @@
           "name": null,
           "expression": "(assigned_at IS NOT NULL)"
         }
-      ]
+      ],
+      "indexes": [],
+      "sequences": []
     },
     "inventory.products": {
       "name": "inventory.products",
@@ -148,7 +152,12 @@
           ]
         }
       ],
-      "check_constraints": []
+      "check_constraints": [],
+      "indexes": [],
+      "sequences": []
     }
-  }
+  },
+  "views": {},
+  "indexes": [],
+  "sequences": []
 }

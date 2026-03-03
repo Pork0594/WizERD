@@ -344,3 +344,126 @@ def test_complex_fixture_matches_snapshot():
     expected = json.loads(Path("tests/fixtures/complex_sample.expected.json").read_text())
 
     assert schema.to_dict() == expected
+
+
+def test_parse_create_index():
+    """Parser should capture index name, table, columns, and type."""
+    sql_text = """
+    CREATE INDEX idx_user_email ON users (email);
+    CREATE UNIQUE INDEX idx_user_name ON users (name);
+    CREATE INDEX idx_orders_total ON orders (total DESC) USING btree;
+    """
+
+    parser = DDLParser()
+    schema = parser.parse(sql_text)
+
+    assert len(schema.indexes) == 3
+
+    idx1 = schema.indexes[0]
+    assert idx1.name == "idx_user_email"
+    assert idx1.table_name == "users"
+    assert idx1.columns == ["email"]
+    assert idx1.is_unique is False
+    assert idx1.index_type == "btree"
+
+    idx2 = schema.indexes[1]
+    assert idx2.name == "idx_user_name"
+    assert idx2.is_unique is True
+
+    idx3 = schema.indexes[2]
+    assert idx3.columns == ["total"]
+    assert idx3.index_type == "btree"
+
+
+def test_parse_create_view():
+    """Parser should capture view name, schema, and referenced tables."""
+    sql_text = """
+    CREATE VIEW analytics.user_summary AS
+        SELECT u.id, u.name, COUNT(o.id) as order_count
+        FROM users u
+        LEFT JOIN orders o ON u.id = o.user_id
+        GROUP BY u.id, u.name;
+    """
+
+    parser = DDLParser()
+    schema = parser.parse(sql_text)
+
+    assert len(schema.views) == 1
+    view = schema.views["analytics.user_summary"]
+    assert view.name == "user_summary"
+    assert view.schema == "analytics"
+    assert "users" in view.referenced_tables
+    assert "orders" in view.referenced_tables
+
+
+def test_parse_create_sequence():
+    """Parser should capture sequence properties."""
+    sql_text = """
+    CREATE SEQUENCE order_id_seq
+        START WITH 1000
+        INCREMENT BY 1
+        MAXVALUE 999999
+        MINVALUE 1;
+    """
+
+    parser = DDLParser()
+    schema = parser.parse(sql_text)
+
+    assert len(schema.sequences) == 1
+    seq = schema.sequences[0]
+    assert seq.name == "order_id_seq"
+    assert seq.start_value == 1000
+    assert seq.increment == 1
+    assert seq.max_value == 999999
+    assert seq.min_value == 1
+
+
+def test_parse_serial_columns():
+    """Parser should detect SERIAL columns and create implicit sequences."""
+    sql_text = """
+    CREATE TABLE posts (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL
+    );
+
+    CREATE TABLE comments (
+        id BIGSERIAL PRIMARY KEY,
+        post_id INTEGER REFERENCES posts(id),
+        body TEXT
+    );
+    """
+
+    parser = DDLParser()
+    schema = parser.parse(sql_text)
+
+    assert len(schema.sequences) == 2
+
+    posts_seq = next(
+        (s for s in schema.sequences if s.table_name == "posts" and s.column_name == "id"), None
+    )
+    assert posts_seq is not None
+    assert posts_seq.increment == 1
+
+    comments_seq = next(
+        (s for s in schema.sequences if s.table_name == "comments" and s.column_name == "id"), None
+    )
+    assert comments_seq is not None
+    assert comments_seq.max_value == 9223372036854775807
+
+
+def test_indexes_attached_to_table():
+    """Indexes should be attached to their parent table."""
+    sql_text = """
+    CREATE TABLE users (
+        id INTEGER PRIMARY KEY,
+        email TEXT
+    );
+    CREATE INDEX idx_email ON users (email);
+    """
+
+    parser = DDLParser()
+    schema = parser.parse(sql_text)
+
+    users_table = schema.tables["users"]
+    assert len(users_table.indexes) == 1
+    assert users_table.indexes[0].name == "idx_email"

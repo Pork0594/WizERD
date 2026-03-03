@@ -5,7 +5,7 @@ from __future__ import annotations
 import xml.etree.ElementTree as ET
 
 from wizerd.graph.layout_graph import PositionedDiagram, PositionedEdge, PositionedNode
-from wizerd.model.schema import Column, SchemaModel, Table
+from wizerd.model.schema import Column, Index, SchemaModel, Sequence, Table, View
 from wizerd.render.svg_renderer import RendererTheme, SVGRenderer
 
 
@@ -61,7 +61,7 @@ def test_svg_renderer_outputs_styled_tables(tmp_path):
     renderer.render(diagram, schema, output_path)
 
     content = output_path.read_text()
-    assert ">users<" in content
+    assert ">public.users<" in content
     assert "email" in content
     assert "marker" in content  # arrow definition
     assert "posts_user_id_fkey" not in content
@@ -104,6 +104,57 @@ def test_svg_renderer_uses_trunk_colors(tmp_path):
 
     content = output_path.read_text()
     assert "#f472b6" in content
+
+
+def test_svg_renderer_renders_markers_and_new_features(tmp_path):
+    """Renderer should handle views, indexes, sequences, and render markers."""
+    users = Table(name="public.users", schema="public")
+    users.add_column(Column(name="id", data_type="uuid", nullable=False, is_primary=True))
+    users.add_column(Column(name="email", data_type="text", nullable=False))
+
+    users.indexes.append(
+        Index(name="idx_users_email", table_name="public.users", columns=["email"])
+    )
+    users.sequences.append(
+        Sequence(name="seq_users_id", table_name="public.users", column_name="id")
+    )
+
+    user_view = View(
+        name="public.active_users",
+        schema="public",
+        definition="SELECT * FROM public.users",
+        columns=["id", "email"],
+    )
+
+    schema = SchemaModel(tables={"public.users": users}, views={"public.active_users": user_view})
+
+    users_node = PositionedNode(table_name="public.users", width=320, height=150, x=60, y=60)
+    view_node = PositionedNode(table_name="public.active_users", width=320, height=150, x=480, y=60)
+
+    diagram = PositionedDiagram(
+        nodes={"public.users": users_node, "public.active_users": view_node}, edges=[]
+    )
+
+    theme = RendererTheme(
+        pk_marker="#111111", idx_marker="#222222", seq_marker="#333333", marker_size=12.5
+    )
+
+    renderer = SVGRenderer(theme=theme, show_indexes=True, show_sequences=True)
+    output_path = tmp_path / "diagram.svg"
+    renderer.render(diagram, schema, output_path)
+
+    content = output_path.read_text()
+
+    # View should be rendered
+    assert ">public.active_users<" in content
+
+    # Check custom markers
+    assert "#111111" in content  # pk_marker
+    assert "#222222" in content  # idx_marker
+    assert "#333333" in content  # seq_marker
+
+    # Check marker_size is applied
+    assert 'r="6.25"' in content  # 12.5 / 2
 
 
 def test_svg_renderer_falls_back_to_default_color_without_trunk_colors(tmp_path):
