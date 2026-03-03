@@ -62,6 +62,8 @@ class ThemeColors:
     zebra_row: str = "#101b2d"
     pk_marker: str = "#fbbf24"
     fk_marker: str = "#38bdf8"
+    idx_marker: str = "#a78bfa"
+    seq_marker: str = "#34d399"
 
 
 @dataclass
@@ -93,6 +95,8 @@ class Theme:
             zebra_row=self.colors.zebra_row,
             pk_marker=self.colors.pk_marker,
             fk_marker=self.colors.fk_marker,
+            idx_marker=self.colors.idx_marker,
+            seq_marker=self.colors.seq_marker,
             edge_color=self.edges.edge_color,
             edge_secondary=self.edges.edge_secondary,
             edge_color_palette=self.edges.edge_color_palette,
@@ -131,6 +135,8 @@ class Theme:
                 "zebra_row": self.colors.zebra_row,
                 "pk_marker": self.colors.pk_marker,
                 "fk_marker": self.colors.fk_marker,
+                "idx_marker": self.colors.idx_marker,
+                "seq_marker": self.colors.seq_marker,
             },
             "typography": {
                 "font_family": self.typography.font_family,
@@ -177,6 +183,8 @@ class Theme:
             zebra_row=colors_data.get("zebra_row", ThemeColors().zebra_row),
             pk_marker=colors_data.get("pk_marker", ThemeColors().pk_marker),
             fk_marker=colors_data.get("fk_marker", ThemeColors().fk_marker),
+            idx_marker=colors_data.get("idx_marker", ThemeColors().idx_marker),
+            seq_marker=colors_data.get("seq_marker", ThemeColors().seq_marker),
         )
 
         typ_data = data.get("typography", {})

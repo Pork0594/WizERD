@@ -339,16 +339,13 @@ class SVGRenderer:
                 label = f"{idx.name}({cols_str}) {type_str}".strip()
 
                 group.add(
-                    dwg.text(
-                        "idx",
-                        insert=(node.x + (theme.table_side_padding + marker_size)/2, row_top + theme.row_height / 2),
-                        text_anchor="middle",
-                        dominant_baseline="middle",
-                        font_size=f"{theme.font_size_secondary}px",
-                        font_family=theme.font_family,
-                        fill=theme.table_body_text,
+                    dwg.circle(
+                        center=(node.x + (theme.table_side_padding + marker_size) / 2, row_top + theme.row_height / 2),
+                        r=marker_size/2,
+                        fill=theme.idx_marker,
                     )
                 )
+
                 group.add(
                     dwg.text(
                         label,
@@ -376,14 +373,10 @@ class SVGRenderer:
                 label = f"{seq.name}({seq.increment})"
 
                 group.add(
-                    dwg.text(
-                        "seq",
-                        insert=(node.x + theme.table_side_padding + marker_size, row_top + theme.row_height / 2),
-                        text_anchor="middle",
-                        dominant_baseline="middle",
-                        font_size=f"{theme.font_size_secondary}px",
-                        font_family=theme.font_family,
-                        fill=theme.table_body_text,
+                    dwg.circle(
+                        center=(node.x + (theme.table_side_padding + marker_size) / 2, row_top + theme.row_height / 2),
+                        r=marker_size/2,
+                        fill=theme.seq_marker,
                     )
                 )
 

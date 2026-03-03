@@ -25,6 +25,8 @@ class RendererTheme:
     zebra_row: str = "#101b2d"
     pk_marker: str = "#fbbf24"
     fk_marker: str = "#38bdf8"
+    idx_marker: str = "#a78bfa"
+    seq_marker: str = "#34d399"
     edge_color: str = "#7dd3fc"
     edge_secondary: str = "#164e63"
     edge_color_palette: Tuple[str, ...] = tuple(EDGE_COLOR_PALETTE)

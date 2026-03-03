@@ -13,7 +13,9 @@
       "table_secondary_text": "#94a3b8",
       "zebra_row": "#101b2d",
       "pk_marker": "#fbbf24",
-      "fk_marker": "#38bdf8"
+      "fk_marker": "#38bdf8",
+      "idx_marker": "#a78bfa",
+      "seq_marker": "#34d399"
     },
     "typography": {
       "font_family": "'Sora', 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif",
@@ -72,7 +74,9 @@
       "table_secondary_text": "#64748b",
       "zebra_row": "#f8fafc",
       "pk_marker": "#b45309",
-      "fk_marker": "#0369a1"
+      "fk_marker": "#0369a1",
+      "idx_marker": "#7c3aed",
+      "seq_marker": "#059669"
     },
     "typography": {
       "font_family": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
@@ -126,7 +130,9 @@
       "table_secondary_text": "#888888",
       "zebra_row": "#101010",
       "pk_marker": "#ffffff",
-      "fk_marker": "#bbbbbb"
+      "fk_marker": "#bbbbbb",
+      "idx_marker": "#999999",
+      "seq_marker": "#dddddd"
     },
     "typography": {
       "font_family": "'JetBrains Mono', 'Fira Code', monospace",
@@ -180,7 +186,9 @@
       "table_secondary_text": "#93a1a1",
       "zebra_row": "#073642",
       "pk_marker": "#b58900",
-      "fk_marker": "#2aa198"
+      "fk_marker": "#2aa198",
+      "idx_marker": "#6c71c4",
+      "seq_marker": "#d33682"
     },
     "typography": {
       "font_family": "'Source Code Pro', monospace",
@@ -234,7 +242,9 @@
       "table_secondary_text": "#e5e5e5",
       "zebra_row": "#0d0d0d",
       "pk_marker": "#ffff00",
-      "fk_marker": "#00ffff"
+      "fk_marker": "#00ffff",
+      "idx_marker": "#ff00ff",
+      "seq_marker": "#00ff00"
     },
     "typography": {
       "font_family": "'Arial', sans-serif",
@@ -288,7 +298,9 @@
       "table_secondary_text": "#7dd3fc",
       "zebra_row": "#0f2744",
       "pk_marker": "#fbbf24",
-      "fk_marker": "#38bdf8"
+      "fk_marker": "#38bdf8",
+      "idx_marker": "#a78bfa",
+      "seq_marker": "#2dd4bf"
     },
     "typography": {
       "font_family": "'Nunito', -apple-system, sans-serif",
@@ -342,7 +354,9 @@
       "table_secondary_text": "#6ab06a",
       "zebra_row": "#0d1a0d",
       "pk_marker": "#86efac",
-      "fk_marker": "#4ade80"
+      "fk_marker": "#4ade80",
+      "idx_marker": "#60a5fa",
+      "seq_marker": "#facc15"
     },
     "typography": {
       "font_family": "'Lora', serif",
@@ -396,7 +410,9 @@
       "table_secondary_text": "#f87171",
       "zebra_row": "#2d0f0f",
       "pk_marker": "#fcd34d",
-      "fk_marker": "#fb923c"
+      "fk_marker": "#fb923c",
+      "idx_marker": "#f472b6",
+      "seq_marker": "#a78bfa"
     },
     "typography": {
       "font_family": "'Merriweather', serif",
@@ -450,7 +466,9 @@
       "table_secondary_text": "#444444",
       "zebra_row": "#ffffff",
       "pk_marker": "#000000",
-      "fk_marker": "#333333"
+      "fk_marker": "#333333",
+      "idx_marker": "#555555",
+      "seq_marker": "#777777"
     },
     "typography": {
       "font_family": "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -499,7 +517,9 @@
       "table_secondary_text": "#8a8072",
       "zebra_row": "#faf5f0",
       "pk_marker": "#8b6914",
-      "fk_marker": "#5c4033"
+      "fk_marker": "#5c4033",
+      "idx_marker": "#556b2f",
+      "seq_marker": "#cd853f"
     },
     "typography": {
       "font_family": "'Georgia', serif",
@@ -553,7 +573,9 @@
       "table_secondary_text": "#008800",
       "zebra_row": "#0a0a0a",
       "pk_marker": "#00ff00",
-      "fk_marker": "#00ff00"
+      "fk_marker": "#00ff00",
+      "idx_marker": "#00cc00",
+      "seq_marker": "#008800"
     },
     "typography": {
       "font_family": "'Courier New', Courier, monospace",
@@ -602,7 +624,9 @@
       "table_secondary_text": "#d8dee9",
       "zebra_row": "#3b4252",
       "pk_marker": "#ebcb8b",
-      "fk_marker": "#88c0d0"
+      "fk_marker": "#88c0d0",
+      "idx_marker": "#b48ead",
+      "seq_marker": "#a3be8c"
     },
     "typography": {
       "font_family": "'Segoe UI', -apple-system, sans-serif",
@@ -656,7 +680,9 @@
       "table_secondary_text": "#6272a4",
       "zebra_row": "#282a36",
       "pk_marker": "#ffb86c",
-      "fk_marker": "#8be9fd"
+      "fk_marker": "#8be9fd",
+      "idx_marker": "#bd93f9",
+      "seq_marker": "#ff79c6"
     },
     "typography": {
       "font_family": "'Fira Code', monospace",
