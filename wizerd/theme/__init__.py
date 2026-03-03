@@ -108,6 +108,7 @@ class Theme:
             row_height=self.dimensions.row_height,
             corner_radius=self.dimensions.corner_radius,
             table_stroke_width=self.dimensions.table_stroke_width,
+            table_side_padding=self.dimensions.table_side_padding,
             edge_width=self.edges.edge_width,
             edge_trunk_width=self.edges.edge_trunk_width,
             edge_corner_radius=self.edges.edge_corner_radius,

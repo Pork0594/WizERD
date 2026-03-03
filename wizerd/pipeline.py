@@ -8,7 +8,7 @@ from typing import Any, Dict
 from wizerd import config
 from wizerd.graph.layout_graph import GraphEdge, GraphNode, LayoutGraph
 from wizerd.layout.engine import ElkLayoutEngine, LayoutEngine, LayoutResult, SimpleLayoutEngine
-from wizerd.model.schema import SchemaModel, Table
+from wizerd.model.schema import SchemaModel, Table, View
 from wizerd.parser.ddl_parser import DDLParser
 from wizerd.render.svg_renderer import SVGRenderer
 from wizerd.theme import Theme
@@ -24,12 +24,16 @@ DEFAULT_TABLE_ROW_HEIGHT = 30.0
 DEFAULT_TABLE_FOOTER_PADDING = 0.0
 DEFAULT_CHAR_PIXEL_WIDTH = 7.6
 DEFAULT_TABLE_SIDE_PADDING = 28.0
+DEFAULT_MARKER_SIZE = 10.0
 
 
 def _schema_to_graph(
     schema: SchemaModel,
     edge_color_mode: config.EdgeColorMode,
     theme: Theme,
+    show_indexes: bool = False,
+    show_views: bool = False,
+    show_sequences: bool = False,
 ) -> tuple[LayoutGraph, dict[tuple[str, str | None], str]]:
     """Convert the parsed schema into a layout graph the renderer understands.
 
@@ -46,9 +50,16 @@ def _schema_to_graph(
     header_height = theme.dimensions.header_height
     row_height = theme.dimensions.row_height
     side_padding = theme.dimensions.table_side_padding
+    marker_size = theme.typography.font_size_secondary
     char_width = theme.typography.char_pixel_width
 
     for table in schema.tables.values():
+        extra_rows = 0
+        if show_indexes:
+            extra_rows += len(table.indexes)
+        if show_sequences:
+            extra_rows += len(table.sequences)
+
         width, height, anchors = _measure_table(
             table,
             table_min_width=table_min_width,
@@ -56,7 +67,9 @@ def _schema_to_graph(
             header_height=header_height,
             row_height=row_height,
             side_padding=side_padding,
+            marker_size=marker_size,
             char_width=char_width,
+            extra_rows=extra_rows,
         )
         graph.add_node(
             GraphNode(
@@ -67,6 +80,45 @@ def _schema_to_graph(
                 column_anchors=anchors,
             )
         )
+
+    if show_views:
+        for view in schema.views.values():
+            view_width, view_height, view_anchors = _measure_view(
+                view,
+                table_min_width=table_min_width,
+                table_max_width=table_max_width,
+                header_height=header_height,
+                row_height=row_height,
+                side_padding=side_padding,
+                char_width=char_width,
+            )
+            view_full_name = f"{view.schema}.{view.name}" if view.schema else view.name
+            graph.add_node(
+                GraphNode(
+                    table_name=view_full_name,
+                    width=view_width,
+                    height=view_height,
+                    group=view.schema,
+                    column_anchors=view_anchors,
+                    is_view=True,
+                )
+            )
+
+            referenced_tables = list(dict.fromkeys(view.referenced_tables)) if view.referenced_tables else []
+            for ref_table in referenced_tables:
+                if ref_table in schema.tables:
+                    graph.add_edge(
+                        GraphEdge(
+                            source=ref_table,
+                            target=view_full_name,
+                            label="",
+                            source_column=None,
+                            target_column=None,
+                            bundle_key=(view_full_name, None),
+                            trunk_key=None,
+                            is_view_reference=True,
+                        )
+                    )
 
     trunk_keys: set[tuple[str, str | None]] = set()
     for table in schema.tables.values():
@@ -124,7 +176,9 @@ def _measure_table(
     header_height: float = DEFAULT_TABLE_HEADER_HEIGHT,
     row_height: float = DEFAULT_TABLE_ROW_HEIGHT,
     side_padding: float = DEFAULT_TABLE_SIDE_PADDING,
+    marker_size: float = DEFAULT_MARKER_SIZE,
     char_width: float = DEFAULT_CHAR_PIXEL_WIDTH,
+    extra_rows: int = 0,
 ) -> tuple[float, float, dict[str, float]]:
     """Return the on-canvas footprint for a table and lookup offsets.
 
@@ -134,7 +188,7 @@ def _measure_table(
     routing logic where each column sits vertically so edges can snap to the
     right row.
     """
-    rows = max(1, len(table.columns))
+    rows = max(1, len(table.columns) + extra_rows)
     height = header_height + rows * row_height + DEFAULT_TABLE_FOOTER_PADDING
 
     longest = len(table.name)
@@ -142,7 +196,18 @@ def _measure_table(
         label = f"{column.name}  {column.data_type}"
         longest = max(longest, len(label))
 
-    width = side_padding * 2 + longest * char_width
+    if extra_rows > 0:
+        for idx in table.indexes:
+            unique_str = "unique " if idx.is_unique else ""
+            cols_str = ", ".join(idx.columns) if idx.columns else ""
+            type_str = f"({idx.index_type}, {unique_str}idx)" if idx.index_type != "btree" or idx.is_unique else f"({idx.index_type} idx)"
+            label = f"{idx.name}({cols_str}) {type_str}".strip()
+            longest = max(longest, len(label))
+        for seq in table.sequences:
+            label = f"{seq.name} (inc={seq.increment})"
+            longest = max(longest, len(label))
+
+    width = side_padding * 2 + longest * char_width + marker_size
     width = max(table_min_width, min(width, table_max_width))
 
     anchors: dict[str, float] = {}
@@ -150,6 +215,39 @@ def _measure_table(
     for column in table.columns.values():
         anchors[column.name] = current
         current += row_height
+
+    return width, height, anchors
+
+
+def _measure_view(
+    view: View,
+    table_min_width: float = DEFAULT_TABLE_MIN_WIDTH,
+    table_max_width: float = DEFAULT_TABLE_MAX_WIDTH,
+    header_height: float = DEFAULT_TABLE_HEADER_HEIGHT,
+    row_height: float = DEFAULT_TABLE_ROW_HEIGHT,
+    side_padding: float = DEFAULT_TABLE_SIDE_PADDING,
+    char_width: float = DEFAULT_CHAR_PIXEL_WIDTH,
+) -> tuple[float, float, dict[str, float]]:
+    """Return the on-canvas footprint for a view and lookup offsets."""
+    columns = view.columns if view.columns else []
+
+    rows = max(1, len(columns))
+    height = header_height + rows * row_height + DEFAULT_TABLE_FOOTER_PADDING
+
+    longest = len(view.name)
+    if columns:
+        for col in columns:
+            longest = max(longest, len(col))
+
+    width = side_padding * 2 + longest * char_width
+    width = max(table_min_width, min(width, table_max_width))
+
+    anchors: dict[str, float] = {}
+    current = header_height + row_height / 2
+    if columns:
+        for col in columns:
+            anchors[col] = current
+            current += row_height
 
     return width, height, anchors
 
@@ -179,7 +277,14 @@ def run(app_config: config.AppConfig) -> None:
             "No tables found in schema dump. Ensure the SQL contains CREATE TABLE statements."
         )
 
-    graph, trunk_colors = _schema_to_graph(schema, app_config.edge_color_mode, theme)
+    graph, trunk_colors = _schema_to_graph(
+        schema,
+        app_config.edge_color_mode,
+        theme,
+        show_indexes=app_config.show_indexes,
+        show_views=app_config.show_views,
+        show_sequences=app_config.show_sequences,
+    )
 
     layout_engine: LayoutEngine
     try:
@@ -200,5 +305,8 @@ def run(app_config: config.AppConfig) -> None:
         theme=renderer_theme,
         show_edge_labels=app_config.show_edge_labels,
         trunk_colors=trunk_colors if trunk_colors else None,
+        show_indexes=app_config.show_indexes,
+        show_views=app_config.show_views,
+        show_sequences=app_config.show_sequences,
     )
     renderer.render(layout_result.diagram, schema, app_config.output_path)

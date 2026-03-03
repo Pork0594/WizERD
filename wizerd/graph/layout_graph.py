@@ -15,6 +15,7 @@ class GraphNode:
     height: float = 120.0
     group: str | None = None
     column_anchors: Dict[str, float] = field(default_factory=dict)
+    is_view: bool = False
 
 
 @dataclass
@@ -29,6 +30,7 @@ class GraphEdge:
     target_column: str | None = None
     bundle_key: tuple[str, str | None] | None = None
     trunk_key: tuple[str, str | None] | None = None
+    is_view_reference: bool = False
 
 
 @dataclass

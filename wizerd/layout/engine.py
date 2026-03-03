@@ -195,6 +195,24 @@ class ElkLayoutEngine:
         children = []
         for node in graph.nodes.values():
             ports = []
+            
+            ports.append(
+                {
+                    "id": f"{node.table_name}::east",
+                    "x": node.width,
+                    "y": node.height / 2,
+                    "layoutOptions": {"org.eclipse.elk.port.side": "EAST"},
+                }
+            )
+            ports.append(
+                {
+                    "id": f"{node.table_name}::west",
+                    "x": 0.0,
+                    "y": node.height / 2,
+                    "layoutOptions": {"org.eclipse.elk.port.side": "WEST"},
+                }
+            )
+            
             if node.column_anchors:
                 for col_name, y_offset in node.column_anchors.items():
                     ports.append(
@@ -213,23 +231,6 @@ class ElkLayoutEngine:
                             "layoutOptions": {"org.eclipse.elk.port.side": "WEST"},
                         }
                     )
-            else:
-                ports.append(
-                    {
-                        "id": f"{node.table_name}::east",
-                        "x": node.width,
-                        "y": node.height / 2,
-                        "layoutOptions": {"org.eclipse.elk.port.side": "EAST"},
-                    }
-                )
-                ports.append(
-                    {
-                        "id": f"{node.table_name}::west",
-                        "x": 0.0,
-                        "y": node.height / 2,
-                        "layoutOptions": {"org.eclipse.elk.port.side": "WEST"},
-                    }
-                )
 
             children.append(
                 {
@@ -324,6 +325,7 @@ class ElkLayoutEngine:
                 height=original.height,
                 group=original.group,
                 column_anchors=original.column_anchors,
+                is_view=getattr(original, "is_view", False),
                 x=float(child.get("x", 0.0)),
                 y=float(child.get("y", 0.0)),
             )
