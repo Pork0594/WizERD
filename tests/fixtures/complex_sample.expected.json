@@ -1,7 +1,7 @@
 {
   "tables": {
     "inventory.categories": {
-      "name": "inventory.categories",
+      "name": "categories",
       "schema": "inventory",
       "columns": [
         {
@@ -34,7 +34,7 @@
       "sequences": []
     },
     "inventory.product_categories": {
-      "name": "inventory.product_categories",
+      "name": "product_categories",
       "schema": "inventory",
       "columns": [
         {
@@ -102,7 +102,7 @@
       "sequences": []
     },
     "inventory.products": {
-      "name": "inventory.products",
+      "name": "products",
       "schema": "inventory",
       "columns": [
         {

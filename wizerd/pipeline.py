@@ -52,6 +52,8 @@ def _schema_to_graph(
     side_padding = theme.dimensions.table_side_padding
     marker_size = theme.typography.font_size_secondary
     char_width = theme.typography.char_pixel_width
+    font_size_body = theme.typography.font_size_body
+    header_char_width = char_width * (theme.typography.font_size_header / font_size_body)
 
     for table in schema.tables.values():
         extra_rows = 0
@@ -69,11 +71,12 @@ def _schema_to_graph(
             side_padding=side_padding,
             marker_size=marker_size,
             char_width=char_width,
+            header_char_width=header_char_width,
             extra_rows=extra_rows,
         )
         graph.add_node(
             GraphNode(
-                table_name=table.name,
+                table_name=table.full_name,
                 width=width,
                 height=height,
                 group=table.schema,
@@ -91,6 +94,7 @@ def _schema_to_graph(
                 row_height=row_height,
                 side_padding=side_padding,
                 char_width=char_width,
+                header_char_width=header_char_width,
             )
             view_full_name = f"{view.schema}.{view.name}" if view.schema else view.name
             graph.add_node(
@@ -180,6 +184,7 @@ def _measure_table(
     side_padding: float = DEFAULT_TABLE_SIDE_PADDING,
     marker_size: float = DEFAULT_MARKER_SIZE,
     char_width: float = DEFAULT_CHAR_PIXEL_WIDTH,
+    header_char_width: float | None = None,
     extra_rows: int = 0,
 ) -> tuple[float, float, dict[str, float]]:
     """Return the on-canvas footprint for a table and lookup offsets.
@@ -190,13 +195,16 @@ def _measure_table(
     routing logic where each column sits vertically so edges can snap to the
     right row.
     """
+    if header_char_width is None:
+        header_char_width = char_width
+
     rows = max(1, len(table.columns) + extra_rows)
     height = header_height + rows * row_height + DEFAULT_TABLE_FOOTER_PADDING
 
-    longest = len(table.name)
+    max_text_width = len(table.full_name) * header_char_width
     for column in table.columns.values():
         label = f"{column.name}  {column.data_type}"
-        longest = max(longest, len(label))
+        max_text_width = max(max_text_width, len(label) * char_width)
 
     if extra_rows > 0:
         for idx in table.indexes:
@@ -208,12 +216,12 @@ def _measure_table(
                 else f"({idx.index_type} idx)"
             )
             label = f"{idx.name}({cols_str}) {type_str}".strip()
-            longest = max(longest, len(label))
+            max_text_width = max(max_text_width, len(label) * char_width)
         for seq in table.sequences:
             label = f"{seq.name} (inc={seq.increment})"
-            longest = max(longest, len(label))
+            max_text_width = max(max_text_width, len(label) * char_width)
 
-    width = side_padding * 2 + longest * char_width + marker_size
+    width = side_padding * 2 + max_text_width + marker_size
     width = max(table_min_width, min(width, table_max_width))
 
     anchors: dict[str, float] = {}
@@ -233,19 +241,23 @@ def _measure_view(
     row_height: float = DEFAULT_TABLE_ROW_HEIGHT,
     side_padding: float = DEFAULT_TABLE_SIDE_PADDING,
     char_width: float = DEFAULT_CHAR_PIXEL_WIDTH,
+    header_char_width: float | None = None,
 ) -> tuple[float, float, dict[str, float]]:
     """Return the on-canvas footprint for a view and lookup offsets."""
+    if header_char_width is None:
+        header_char_width = char_width
+
     columns = view.columns if view.columns else []
 
     rows = max(1, len(columns))
     height = header_height + rows * row_height + DEFAULT_TABLE_FOOTER_PADDING
 
-    longest = len(view.name)
+    max_text_width = len(view.full_name) * header_char_width
     if columns:
         for col in columns:
-            longest = max(longest, len(col))
+            max_text_width = max(max_text_width, len(col) * char_width)
 
-    width = side_padding * 2 + longest * char_width
+    width = side_padding * 2 + max_text_width
     width = max(table_min_width, min(width, table_max_width))
 
     anchors: dict[str, float] = {}

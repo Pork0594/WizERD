@@ -84,7 +84,7 @@ class DDLParser:
                 table = self._parse_create_table(statement)
                 if not table:
                     continue
-                existing = schema.tables.get(table.name)
+                existing = schema.tables.get(table.full_name)
                 if existing:
                     table.foreign_keys = existing.foreign_keys + table.foreign_keys
                     table.unique_constraints = (
@@ -101,7 +101,7 @@ class DDLParser:
                 index = self._parse_create_index(statement)
                 if index:
                     schema.add_index(index)
-                    table = schema.tables.get(index.table_name)
+                    table = schema.tables.get(index.full_table_name)
                     if table:
                         table.indexes.append(index)
             elif stmt_type == StatementType.CREATE_VIEW:
@@ -112,8 +112,8 @@ class DDLParser:
                 sequence = self._parse_create_sequence(statement)
                 if sequence:
                     schema.add_sequence(sequence)
-                    if sequence.table_name and sequence.column_name:
-                        table = schema.tables.get(sequence.table_name)
+                    if sequence.full_table_name and sequence.column_name:
+                        table = schema.tables.get(sequence.full_table_name)
                         if table and sequence.column_name in table.columns:
                             table.sequences.append(sequence)
             else:
@@ -190,7 +190,7 @@ class DDLParser:
             return None
 
         schema_name, table_name, full_name, token_index = identifier_result
-        table = Table(name=full_name, schema=schema_name)
+        table = Table(name=table_name, schema=schema_name)
 
         body = self._extract_table_body(statement)
         if body is None:
@@ -227,11 +227,11 @@ class DDLParser:
             logger.warning("Unable to parse ALTER TABLE statement: %s", statement.value[:80])
             return
 
-        schema_name, _, full_name, token_index = identifier_result
+        schema_name, table_name, full_name, token_index = identifier_result
         table = schema.tables.get(full_name)
         if not table:
             logger.info("Encountered ALTER TABLE for unknown %s; creating placeholder", full_name)
-            table = Table(name=full_name, schema=schema_name)
+            table = Table(name=table_name, schema=schema_name)
             schema.add_table(table)
 
         body = self._tokens_to_string(statement.tokens[token_index + 1 :]).strip()
@@ -424,7 +424,7 @@ class DDLParser:
                 on_delete, on_update = self._extract_fk_actions(" ".join(constraint_tokens))
                 fk = ForeignKey(
                     name=pending_name,
-                    source_table=table.name,
+                    source_table=table.full_name,
                     source_columns=[name],
                     target_table=target_full,
                     target_columns=target_columns,
@@ -499,7 +499,7 @@ class DDLParser:
             table.foreign_keys.append(
                 ForeignKey(
                     name=constraint_name,
-                    source_table=table.name,
+                    source_table=table.full_name,
                     source_columns=source_columns,
                     target_table=target_full,
                     target_columns=target_columns,
@@ -904,7 +904,6 @@ class DDLParser:
 
         table_name = self._normalize_identifier(table_part)
         schema = schema_name
-        full_table_name = f"{schema}.{table_name}" if schema else table_name
 
         index_type = "btree"
         if "USING" in text.upper():
@@ -921,7 +920,8 @@ class DDLParser:
 
         return Index(
             name=full_index_name,
-            table_name=full_table_name,
+            table_name=table_name,
+            schema=schema,
             columns=columns,
             is_unique=is_unique,
             index_type=index_type,
@@ -1043,11 +1043,13 @@ class DDLParser:
 
         table_name: Optional[str] = None
         column_name: Optional[str] = None
+        schema: Optional[str] = schema_name
 
         return DbSequence(
             name=full_seq_name,
             table_name=table_name,
             column_name=column_name,
+            schema=schema,
             start_value=start_value,
             increment=increment,
             min_value=min_value,
@@ -1072,6 +1074,7 @@ class DDLParser:
                 seq = DbSequence(
                     name=seq_name,
                     table_name=table.name,
+                    schema=table.schema,
                     column_name=column.name,
                     start_value=start,
                     increment=increment,

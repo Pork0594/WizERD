@@ -214,7 +214,7 @@ class SVGRenderer:
             clip_path=f"url(#{clip_id})",
         )
         group.add(header_rect)
-        header_text = node.table_name if not table else table.name
+        header_text = node.table_name if not table else table.full_name
         group.add(
             dwg.text(
                 header_text,

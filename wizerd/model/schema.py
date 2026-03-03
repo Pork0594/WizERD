@@ -37,13 +37,20 @@ class Index:
     name: str
     table_name: str
     columns: List[str]
+    schema: Optional[str] = None
     is_unique: bool = False
     index_type: str = "btree"
+
+    @property
+    def full_table_name(self) -> str:
+        """Return the fully qualified table name (schema.table_name)."""
+        return f"{self.schema}.{self.table_name}" if self.schema else self.table_name
 
     def to_dict(self) -> Dict[str, object]:
         """Serialize the index for tooling."""
         return {
             "name": self.name,
+            "schema": self.schema,
             "table_name": self.table_name,
             "columns": self.columns,
             "is_unique": self.is_unique,
@@ -60,6 +67,11 @@ class View:
     definition: str = ""
     columns: List[str] = field(default_factory=list)
     referenced_tables: List[str] = field(default_factory=list)
+
+    @property
+    def full_name(self) -> str:
+        """Return the fully qualified view name (schema.name)."""
+        return f"{self.schema}.{self.name}" if self.schema else self.name
 
     def to_dict(self) -> Dict[str, object]:
         """Serialize the view for tooling."""
@@ -79,15 +91,24 @@ class Sequence:
     name: str
     table_name: Optional[str] = None
     column_name: Optional[str] = None
+    schema: Optional[str] = None
     start_value: int = 1
     increment: int = 1
     min_value: int = 1
     max_value: int = 2147483647
 
+    @property
+    def full_table_name(self) -> Optional[str]:
+        """Return the fully qualified table name (schema.table_name) if available."""
+        if not self.table_name:
+            return None
+        return f"{self.schema}.{self.table_name}" if self.schema else self.table_name
+
     def to_dict(self) -> Dict[str, object]:
         """Serialize the sequence for tooling."""
         return {
             "name": self.name,
+            "schema": self.schema,
             "table_name": self.table_name,
             "column_name": self.column_name,
             "start_value": self.start_value,
@@ -166,6 +187,11 @@ class Table:
     indexes: List[Index] = field(default_factory=list)
     sequences: List[Sequence] = field(default_factory=list)
 
+    @property
+    def full_name(self) -> str:
+        """Return the fully qualified table name (schema.name)."""
+        return f"{self.schema}.{self.name}" if self.schema else self.name
+
     def add_column(self, column: Column) -> None:
         """Insert or replace a column definition on the table."""
         if column.name in self.columns:
@@ -207,13 +233,14 @@ class SchemaModel:
 
     def add_table(self, table: Table) -> None:
         """Register or replace a table definition keyed by its full name."""
-        if table.name in self.tables:
-            logger.warning("Replacing table definition for %s", table.name)
-        self.tables[table.name] = table
+        full_name = table.full_name
+        if full_name in self.tables:
+            logger.warning("Replacing table definition for %s", full_name)
+        self.tables[full_name] = table
 
     def add_view(self, view: View) -> None:
         """Register or replace a view definition keyed by its full name."""
-        full_name = f"{view.schema}.{view.name}" if view.schema else view.name
+        full_name = view.full_name
         if full_name in self.views:
             logger.warning("Replacing view definition for %s", full_name)
         self.views[full_name] = view

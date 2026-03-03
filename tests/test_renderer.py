@@ -11,16 +11,18 @@ from wizerd.render.svg_renderer import RendererTheme, SVGRenderer
 
 def _build_schema() -> SchemaModel:
     """Construct a tiny schema graph with users and posts tables."""
-    users = Table(name="public.users", schema="public")
+    users = Table(name="users", schema="public")
     users.add_column(Column(name="id", data_type="uuid", nullable=False, is_primary=True))
     users.add_column(Column(name="email", data_type="text", nullable=False))
 
-    posts = Table(name="public.posts", schema="public")
+    posts = Table(name="posts", schema="public")
     posts.add_column(Column(name="id", data_type="uuid", nullable=False, is_primary=True))
     posts.add_column(Column(name="user_id", data_type="uuid", nullable=False))
     posts.add_column(Column(name="title", data_type="text"))
 
-    schema = SchemaModel(tables={"public.users": users, "public.posts": posts})
+    schema = SchemaModel()
+    schema.add_table(users)
+    schema.add_table(posts)
     return schema
 
 
@@ -108,25 +110,27 @@ def test_svg_renderer_uses_trunk_colors(tmp_path):
 
 def test_svg_renderer_renders_markers_and_new_features(tmp_path):
     """Renderer should handle views, indexes, sequences, and render markers."""
-    users = Table(name="public.users", schema="public")
+    users = Table(name="users", schema="public")
     users.add_column(Column(name="id", data_type="uuid", nullable=False, is_primary=True))
     users.add_column(Column(name="email", data_type="text", nullable=False))
 
     users.indexes.append(
-        Index(name="idx_users_email", table_name="public.users", columns=["email"])
+        Index(name="idx_users_email", table_name="users", schema="public", columns=["email"])
     )
     users.sequences.append(
-        Sequence(name="seq_users_id", table_name="public.users", column_name="id")
+        Sequence(name="seq_users_id", table_name="users", schema="public", column_name="id")
     )
 
     user_view = View(
-        name="public.active_users",
+        name="active_users",
         schema="public",
         definition="SELECT * FROM public.users",
         columns=["id", "email"],
     )
 
-    schema = SchemaModel(tables={"public.users": users}, views={"public.active_users": user_view})
+    schema = SchemaModel()
+    schema.add_table(users)
+    schema.add_view(user_view)
 
     users_node = PositionedNode(table_name="public.users", width=320, height=150, x=60, y=60)
     view_node = PositionedNode(table_name="public.active_users", width=320, height=150, x=480, y=60)
