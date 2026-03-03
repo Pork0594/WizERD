@@ -47,5 +47,4 @@ class RendererTheme:
     table_side_padding: float = 28.0
     marker_size: float = 10.0
     edge_width: float = 2.0
-    edge_trunk_width: float = 3.0
     edge_corner_radius: float = 20.0

@@ -43,7 +43,6 @@ class ThemeEdgeStyling:
     edge_color: str = "#7dd3fc"
     edge_secondary: str = "#164e63"
     edge_width: float = 2.0
-    edge_trunk_width: float = 3.0
     edge_corner_radius: float = 20.0
     edge_color_palette: tuple[str, ...] = field(default_factory=lambda: tuple(EDGE_COLOR_PALETTE))
     arrow_marker_id: str = "fk-arrow"
@@ -116,7 +115,6 @@ class Theme:
             table_side_padding=self.dimensions.table_side_padding,
             marker_size=self.dimensions.marker_size,
             edge_width=self.edges.edge_width,
-            edge_trunk_width=self.edges.edge_trunk_width,
             edge_corner_radius=self.edges.edge_corner_radius,
         )
 
@@ -163,7 +161,6 @@ class Theme:
                 "edge_color": self.edges.edge_color,
                 "edge_secondary": self.edges.edge_secondary,
                 "edge_width": self.edges.edge_width,
-                "edge_trunk_width": self.edges.edge_trunk_width,
                 "edge_corner_radius": self.edges.edge_corner_radius,
                 "edge_color_palette": list(self.edges.edge_color_palette),
             },
@@ -226,7 +223,6 @@ class Theme:
             edge_color=edge_data.get("edge_color", ThemeEdgeStyling().edge_color),
             edge_secondary=edge_data.get("edge_secondary", ThemeEdgeStyling().edge_secondary),
             edge_width=edge_data.get("edge_width", ThemeEdgeStyling().edge_width),
-            edge_trunk_width=edge_data.get("edge_trunk_width", ThemeEdgeStyling().edge_trunk_width),
             edge_corner_radius=edge_data.get(
                 "edge_corner_radius", ThemeEdgeStyling().edge_corner_radius
             ),

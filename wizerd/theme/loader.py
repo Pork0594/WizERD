@@ -97,7 +97,6 @@ COLOR_OVERRIDE_MAPPING: dict[str, tuple[str, str]] = {
     "edge_color": ("edges", "edge_color"),
     "edge_secondary": ("edges", "edge_secondary"),
     "edge_width": ("edges", "edge_width"),
-    "edge_trunk_width": ("edges", "edge_trunk_width"),
     "edge_corner_radius": ("edges", "edge_corner_radius"),
     "font_family": ("typography", "font_family"),
     "font_size_header": ("typography", "font_size_header"),
