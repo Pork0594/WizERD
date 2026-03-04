@@ -2,6 +2,59 @@
 
 <!-- version list -->
 
+## v0.4.0 (2026-03-04)
+
+### Bug Fixes
+
+- Remove unused trunk width variable ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+- Update idx and seq to use markers on the rows ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+- Update tests for new config options ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+- **ci**: Allow action to push to main
+  ([`cb08054`](https://github.com/Pork0594/WizERD/commit/cb08054877567dab43403ca3ae10380ce27dca95))
+
+### Documentation
+
+- Add homebrew install option and workflow
+  ([`903dc66`](https://github.com/Pork0594/WizERD/commit/903dc66e53d06bc3f30a7fc4beb6c61768aa7f98))
+
+- Fix enforcement reporting instructions in code of conduct
+  ([#1](https://github.com/Pork0594/WizERD/pull/1),
+  [`f2caf43`](https://github.com/Pork0594/WizERD/commit/f2caf4372ad9d4ddb2ac66ae5d9798479f481d9e))
+
+- Tune docs copy to be easier to read
+  ([`5058672`](https://github.com/Pork0594/WizERD/commit/505867250a064c15c3dc2dfa83a644b55eadb5c6))
+
+- Update docs images to latest version ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+- Update documentation to include new features ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+- Update reference to further docs in readme
+  ([`1e8f554`](https://github.com/Pork0594/WizERD/commit/1e8f554432ca4d96a8598890de12f5ba1a606855))
+
+### Features
+
+- Add a marker size variable ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+- Add indexes, views, and sequences options ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+- Additional schema features ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+- Migrate schema models to use explicit short names and schemas
+  ([#14](https://github.com/Pork0594/WizERD/pull/14),
+  [`5f78cd2`](https://github.com/Pork0594/WizERD/commit/5f78cd2a553fb173bf4a67c6780b1ccccef1e965))
+
+
 ## v0.3.1 (2026-03-02)
 
 ### Bug Fixes
