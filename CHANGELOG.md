@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.4.1 (2026-03-04)
+
+### Bug Fixes
+
+- Update semantic release commit message
+  ([`10385a5`](https://github.com/Pork0594/WizERD/commit/10385a569b8169235f9c3301bbb7e599942986e7))
+
+
 ## v0.4.0 (2026-03-04)
 
 ### Bug Fixes
