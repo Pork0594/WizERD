@@ -251,6 +251,12 @@ class ConfigLoader:
             converted["edge_color_mode"] = "by-trunk" if cli_args["color_by_trunk"] else "single"
         if "theme" in cli_args and cli_args["theme"] is not None:
             converted["theme_name"] = cli_args["theme"]
+        if "show_indexes" in cli_args:
+            converted["show_indexes"] = cli_args["show_indexes"]
+        if "show_views" in cli_args:
+            converted["show_views"] = cli_args["show_views"]
+        if "show_sequences" in cli_args:
+            converted["show_sequences"] = cli_args["show_sequences"]
 
         return converted
 
@@ -312,6 +318,12 @@ class ConfigLoader:
                 result.input_path = Path(value)
             elif norm_key == "show_edge_labels":
                 result.show_edge_labels = bool(value)
+            elif norm_key == "show_indexes":
+                result.show_indexes = bool(value)
+            elif norm_key == "show_views":
+                result.show_views = bool(value)
+            elif norm_key == "show_sequences":
+                result.show_sequences = bool(value)
             elif norm_key == "edge_color_mode":
                 if isinstance(value, bool):
                     result.edge_color_mode = (

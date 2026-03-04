@@ -151,6 +151,24 @@ THEME_OPTION = typer.Option(
     help="Theme name",
 )
 
+SHOW_INDEXES_OPTION = typer.Option(
+    False,
+    "--indexes",
+    help="Include indexes in the diagram",
+)
+
+SHOW_VIEWS_OPTION = typer.Option(
+    False,
+    "--views",
+    help="Include views as separate nodes in the diagram",
+)
+
+SHOW_SEQUENCES_OPTION = typer.Option(
+    False,
+    "--sequences",
+    help="Include sequences for auto-increment columns in the diagram",
+)
+
 CONFIG_OPTION = typer.Option(
     None,
     "--config",
@@ -236,6 +254,9 @@ def _generate_diagram(
     color_by_trunk: bool,
     theme_name: str,
     config_file: Path | None = None,
+    show_indexes: bool = False,
+    show_views: bool = False,
+    show_sequences: bool = False,
 ) -> None:
     """Resolve configuration, validate it, and delegate to the pipeline.
 
@@ -252,6 +273,9 @@ def _generate_diagram(
         "spacing_profile": spacing_profile_name,
         "color_by_trunk": color_by_trunk,
         "theme": theme_name,
+        "show_indexes": show_indexes,
+        "show_views": show_views,
+        "show_sequences": show_sequences,
     }
 
     try:
@@ -306,6 +330,9 @@ def generate(
     color_by_trunk: bool = COLOR_BY_TRUNK_OPTION,
     theme: str = THEME_OPTION,
     config: Path | None = CONFIG_OPTION,
+    indexes: bool = SHOW_INDEXES_OPTION,
+    views: bool = SHOW_VIEWS_OPTION,
+    sequences: bool = SHOW_SEQUENCES_OPTION,
 ) -> None:
     """Generate an ER diagram from a PostgreSQL schema dump (render aliases supported)."""
     _generate_diagram(
@@ -316,6 +343,9 @@ def generate(
         color_by_trunk,
         theme,
         config,
+        indexes,
+        views,
+        sequences,
     )
 
 
@@ -477,6 +507,9 @@ def show_defaults(
         "color-by-trunk": False,
         "theme": "default-dark",
         "edge-color-mode": "single",
+        "indexes": False,
+        "views": False,
+        "sequences": False,
     }
 
     if format == "yaml":

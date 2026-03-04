@@ -11,7 +11,7 @@ from typing import Any, List, Sequence, Tuple
 import svgwrite
 
 from wizerd.graph.layout_graph import PositionedDiagram, PositionedEdge, PositionedNode
-from wizerd.model.schema import SchemaModel, Table
+from wizerd.model.schema import SchemaModel, Table, View
 from wizerd.theme.renderer_theme import RendererTheme
 
 logger = logging.getLogger(__name__)
@@ -26,11 +26,17 @@ class SVGRenderer:
         *,
         show_edge_labels: bool = False,
         trunk_colors: dict[tuple[str, str | None], str] | None = None,
+        show_indexes: bool = False,
+        show_views: bool = False,
+        show_sequences: bool = False,
     ) -> None:
         """Store rendering options; heavy lifting happens inside `render`."""
         self.theme = theme or RendererTheme()
         self.show_edge_labels = show_edge_labels
         self.trunk_colors = trunk_colors or {}
+        self.show_indexes = show_indexes
+        self.show_views = show_views
+        self.show_sequences = show_sequences
         # Default arrow marker id (sanitized for use in DOM)
         self._arrow_marker_id = self._sanitize_dom_id(self.theme.arrow_marker_id)
         # Map of color -> marker id for quick lookup when coloring arrows per-edge
@@ -62,8 +68,13 @@ class SVGRenderer:
         self._draw_edges(dwg, edges_layer, diagram)
 
         for node in sorted(diagram.nodes.values(), key=lambda n: (n.y, n.x)):
-            table = schema.tables.get(node.table_name)
-            self._draw_table(dwg, nodes_layer, node, table)
+            is_view = getattr(node, "is_view", False)
+            if is_view:
+                view = schema.views.get(node.table_name)
+                self._draw_table(dwg, nodes_layer, node, view)
+            else:
+                table = schema.tables.get(node.table_name)
+                self._draw_table(dwg, nodes_layer, node, table)
 
         dwg.save(pretty=True)
 
@@ -122,17 +133,6 @@ class SVGRenderer:
                 continue
             path = self._path_from_points(points)
             edge_color, edge_secondary = self._get_edge_color(edge)
-            layer.add(
-                dwg.path(
-                    d=path,
-                    fill="none",
-                    stroke=edge_secondary,
-                    stroke_width=self.theme.edge_trunk_width,
-                    stroke_linejoin="round",
-                    opacity=0.4,
-                )
-            )
-            # Choose a marker that matches the primary edge color when available
             marker_id = self._color_marker_map.get(edge_color, self._arrow_marker_id)
             layer.add(
                 dwg.path(
@@ -153,8 +153,8 @@ class SVGRenderer:
                 layer.add(
                     dwg.text(
                         edge.label,
-                        insert=(label_point[0] - 0, label_point[1] - 0),
-                        font_size="11px",
+                        insert=(label_point[0], label_point[1]),
+                        font_size=f"{self.theme.font_size_edge_label}px",
                         font_family=self.theme.font_family,
                         fill=self.theme.table_secondary_text,
                     )
@@ -165,65 +165,87 @@ class SVGRenderer:
         dwg: svgwrite.Drawing,
         layer: Any,
         node: PositionedNode,
-        table: Table | None,
+        table: Table | View | None,
     ) -> None:
         """Render a table card with header, zebra rows, and column markers."""
+        isView = isinstance(table, View)
         theme = self.theme
-        group = dwg.g(class_="table")
-        stroke_width = theme.table_stroke_width
-
-        group.add(
-            dwg.rect(
-                insert=(node.x - stroke_width / 2, node.y - stroke_width / 2),
-                size=(node.width + stroke_width, node.height + stroke_width),
-                rx=theme.corner_radius,
-                ry=theme.corner_radius,
-                fill=theme.table_background,
-                stroke=theme.table_border,
-                stroke_width=stroke_width,
-            )
-        )
+        group = dwg.g(class_="table" if not isView else "view")
+        stroke_width = theme.table_stroke_width * 2
 
         clip_id = self._sanitize_dom_id(f"header-clip-{node.table_name}")
         clip_path = dwg.defs.add(dwg.clipPath(id=clip_id))
         clip_path.add(
             dwg.rect(
-                insert=(node.x - stroke_width / 2, node.y - stroke_width / 2),
-                size=(node.width + stroke_width, node.height + stroke_width),
+                insert=(node.x, node.y),
+                size=(node.width, node.height),
                 rx=theme.corner_radius,
                 ry=theme.corner_radius,
             )
         )
 
-        effective_radius = theme.corner_radius - stroke_width / 2
-        header_text = node.table_name if not table else self._format_table_title(table)
+        stroke_rect = dwg.rect(
+            insert=(node.x, node.y),
+            size=(node.width, node.height),
+            rx=theme.corner_radius,
+            ry=theme.corner_radius,
+            stroke=theme.table_border,
+            stroke_width=stroke_width,
+            stroke_dasharray="0" if not isView else "8,4",
+        )
+        group.add(stroke_rect)
+
+        bg_fill_rect = dwg.rect(
+            insert=(node.x, node.y),
+            size=(node.width, node.height),
+            rx=theme.corner_radius,
+            ry=theme.corner_radius,
+            fill=theme.table_background,
+            clip_path=f"url(#{clip_id})",
+        )
+        group.add(bg_fill_rect)
+
         header_rect = dwg.rect(
             insert=(node.x, node.y),
             size=(node.width, theme.header_height),
-            rx=effective_radius,
-            ry=effective_radius,
+            rx=theme.corner_radius,
+            ry=theme.corner_radius,
             fill=theme.table_header_bg,
             clip_path=f"url(#{clip_id})",
         )
         group.add(header_rect)
+        header_text = node.table_name if not table else table.full_name
         group.add(
             dwg.text(
                 header_text,
-                insert=(node.x + 18, node.y + theme.header_height / 2 + 4),
-                font_size="15px",
+                insert=(
+                    node.x + theme.table_side_padding + (theme.marker_size if not isView else 0),
+                    node.y + theme.header_height / 2,
+                ),
+                dominant_baseline="middle",
+                font_size=f"{theme.font_size_header}px",
                 font_family=theme.font_family,
                 fill=theme.table_header_text,
             )
         )
 
+        body_group = dwg.g(clip_path=f"url(#{clip_id})")
+        group.add(body_group)
+
         if table is None:
-            logger.warning("No table metadata for node '%s'", node.table_name)
-        columns = list(table.columns.values()) if table else []
-        if not columns:
-            self._draw_empty_state(dwg, group, node)
-        elif table is not None:
-            assert table is not None
-            self._draw_columns(dwg, group, node, table)
+            logger.warning("No metadata for node '%s'", node.table_name)
+        if isinstance(table, View):
+            if table and (table.columns or table.referenced_tables):
+                self._draw_view_columns(dwg, body_group, node, table)
+            elif not table:
+                self._draw_empty_state(dwg, body_group, node)
+        else:
+            columns = list(table.columns.values()) if table else []
+            if not columns:
+                self._draw_empty_state(dwg, body_group, node)
+            elif table is not None:
+                assert table is not None
+                self._draw_columns(dwg, body_group, node, table)
 
         layer.add(group)
 
@@ -233,8 +255,11 @@ class SVGRenderer:
         group.add(
             dwg.text(
                 "No columns parsed",
-                insert=(node.x + 20, node.y + theme.header_height + 24),
-                font_size="12px",
+                insert=(
+                    node.x + theme.table_side_padding,
+                    node.y + theme.header_height + theme.row_height / 2,
+                ),
+                font_size=f"{theme.font_size_body}px",
                 font_family=theme.font_family,
                 fill=theme.table_secondary_text,
             )
@@ -269,8 +294,11 @@ class SVGRenderer:
             if marker_color:
                 group.add(
                     dwg.circle(
-                        center=(node.x + 18, row_top + theme.row_height / 2),
-                        r=4,
+                        center=(
+                            node.x + (theme.table_side_padding + theme.marker_size) / 2,
+                            row_top + theme.row_height / 2,
+                        ),
+                        r=theme.marker_size / 2,
                         fill=marker_color,
                     )
                 )
@@ -278,8 +306,12 @@ class SVGRenderer:
             group.add(
                 dwg.text(
                     column.name,
-                    insert=(node.x + 32, row_top + theme.row_height / 2 + 5),
-                    font_size="12px",
+                    insert=(
+                        node.x + theme.table_side_padding + theme.marker_size,
+                        row_top + theme.row_height / 2,
+                    ),
+                    dominant_baseline="middle",
+                    font_size=f"{theme.font_size_body}px",
                     font_family=theme.font_family,
                     fill=theme.table_body_text,
                 )
@@ -288,15 +320,140 @@ class SVGRenderer:
             group.add(
                 dwg.text(
                     column.data_type,
-                    insert=(node.x + node.width - 20, row_top + theme.row_height / 2 + 5),
+                    insert=(
+                        node.x + node.width - theme.table_side_padding,
+                        row_top + theme.row_height / 2,
+                    ),
                     text_anchor="end",
-                    font_size="11px",
+                    dominant_baseline="middle",
+                    font_size=f"{theme.font_size_secondary}px",
                     font_family=theme.font_family,
                     fill=theme.table_secondary_text,
                 )
             )
 
             row_idx += 1
+
+        if self.show_indexes:
+            for idx in table.indexes:
+                row_top = y + row_idx * theme.row_height
+                if row_idx % 2 == 1:
+                    group.add(
+                        dwg.rect(
+                            insert=(node.x, row_top),
+                            size=(node.width, theme.row_height),
+                            fill=theme.zebra_row,
+                        )
+                    )
+
+                unique_str = "unique " if idx.is_unique else ""
+                cols_str = ", ".join(idx.columns) if idx.columns else ""
+                type_str = (
+                    f"({idx.index_type}, {unique_str}idx)"
+                    if idx.index_type != "btree" or idx.is_unique
+                    else f"({idx.index_type} idx)"
+                )
+                label = f"{idx.name}({cols_str}) {type_str}".strip()
+
+                group.add(
+                    dwg.circle(
+                        center=(
+                            node.x + (theme.table_side_padding + theme.marker_size) / 2,
+                            row_top + theme.row_height / 2,
+                        ),
+                        r=theme.marker_size / 2,
+                        fill=theme.idx_marker,
+                    )
+                )
+
+                group.add(
+                    dwg.text(
+                        label,
+                        insert=(
+                            node.x + theme.table_side_padding + theme.marker_size,
+                            row_top + theme.row_height / 2,
+                        ),
+                        dominant_baseline="middle",
+                        font_size=f"{theme.font_size_secondary}px",
+                        font_family=theme.font_family,
+                        fill=theme.table_secondary_text,
+                    )
+                )
+                row_idx += 1
+
+        if self.show_sequences:
+            for seq in table.sequences:
+                row_top = y + row_idx * theme.row_height
+                if row_idx % 2 == 1:
+                    group.add(
+                        dwg.rect(
+                            insert=(node.x, row_top),
+                            size=(node.width, theme.row_height),
+                            fill=theme.zebra_row,
+                        )
+                    )
+
+                label = f"{seq.name}({seq.increment})"
+
+                group.add(
+                    dwg.circle(
+                        center=(
+                            node.x + (theme.table_side_padding + theme.marker_size) / 2,
+                            row_top + theme.row_height / 2,
+                        ),
+                        r=theme.marker_size / 2,
+                        fill=theme.seq_marker,
+                    )
+                )
+
+                group.add(
+                    dwg.text(
+                        label,
+                        insert=(node.x + theme.table_side_padding, row_top + theme.row_height / 2),
+                        dominant_baseline="middle",
+                        font_size=f"{theme.font_size_secondary}px",
+                        font_family=theme.font_family,
+                        fill=theme.table_secondary_text,
+                    )
+                )
+                row_idx += 1
+
+    def _draw_view_columns(
+        self, dwg: svgwrite.Drawing, group: Any, node: PositionedNode, view: View
+    ) -> None:
+        """Render view columns like a table."""
+        theme = self.theme
+        y = node.y + theme.header_height
+        row_idx = 0
+
+        columns = view.columns if view.columns else []
+
+        if columns:
+            for col in columns:
+                row_top = y + row_idx * theme.row_height
+                if row_idx % 2 == 1:
+                    group.add(
+                        dwg.rect(
+                            insert=(node.x, row_top),
+                            size=(node.width, theme.row_height),
+                            fill=theme.zebra_row,
+                        )
+                    )
+
+                group.add(
+                    dwg.text(
+                        col,
+                        insert=(node.x + theme.table_side_padding, row_top + theme.row_height / 2),
+                        dominant_baseline="middle",
+                        font_size=f"{theme.font_size_body}px",
+                        font_family=theme.font_family,
+                        fill=theme.table_body_text,
+                    )
+                )
+
+                row_idx += 1
+        else:
+            self._draw_empty_state(dwg, group, node)
 
     def _fk_columns(self, table: Table) -> set[str]:
         """Return the set of column names that participate in any FK."""
@@ -453,12 +610,6 @@ class SVGRenderer:
     def _distance(self, a: Tuple[float, float], b: Tuple[float, float]) -> float:
         """Euclidean distance between two points."""
         return math.hypot(b[0] - a[0], b[1] - a[1])
-
-    def _format_table_title(self, table: Table) -> str:
-        """Allow subclasses to tweak how table names appear in headers."""
-        if table.schema:
-            return table.name.split(".", 1)[-1]
-        return table.name
 
     def _compute_canvas(self, diagram: PositionedDiagram) -> Tuple[float, float]:
         """Compute the overall canvas dimensions including padding."""

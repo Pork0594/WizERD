@@ -6,7 +6,8 @@ import logging
 import re
 from collections import deque
 from pathlib import Path
-from typing import Deque, Iterable, List, Optional, Sequence, Tuple
+from typing import Deque, Iterable, List, Optional, Tuple
+from typing import Sequence as TypingSequence
 
 import sqlparse
 from sqlparse import sql as sql_nodes
@@ -16,9 +17,14 @@ from wizerd.model.schema import (
     CheckConstraint,
     Column,
     ForeignKey,
+    Index,
     SchemaModel,
     Table,
     UniqueConstraint,
+    View,
+)
+from wizerd.model.schema import (
+    Sequence as DbSequence,
 )
 
 logger = logging.getLogger(__name__)
@@ -29,6 +35,9 @@ class StatementType:
 
     CREATE_TABLE = "create_table"
     ALTER_TABLE = "alter_table"
+    CREATE_INDEX = "create_index"
+    CREATE_VIEW = "create_view"
+    CREATE_SEQUENCE = "create_sequence"
 
 
 class DDLParser:
@@ -75,7 +84,7 @@ class DDLParser:
                 table = self._parse_create_table(statement)
                 if not table:
                     continue
-                existing = schema.tables.get(table.name)
+                existing = schema.tables.get(table.full_name)
                 if existing:
                     table.foreign_keys = existing.foreign_keys + table.foreign_keys
                     table.unique_constraints = (
@@ -84,9 +93,29 @@ class DDLParser:
                     table.check_constraints = existing.check_constraints + table.check_constraints
                     if not table.primary_key and existing.primary_key:
                         table.primary_key = existing.primary_key
+                self._detect_serial_columns(table, schema)
                 schema.add_table(table)
             elif stmt_type == StatementType.ALTER_TABLE:
                 self._apply_alter_table(statement, schema)
+            elif stmt_type == StatementType.CREATE_INDEX:
+                index = self._parse_create_index(statement)
+                if index:
+                    schema.add_index(index)
+                    table = schema.tables.get(index.full_table_name)
+                    if table:
+                        table.indexes.append(index)
+            elif stmt_type == StatementType.CREATE_VIEW:
+                view = self._parse_create_view(statement)
+                if view:
+                    schema.add_view(view)
+            elif stmt_type == StatementType.CREATE_SEQUENCE:
+                sequence = self._parse_create_sequence(statement)
+                if sequence:
+                    schema.add_sequence(sequence)
+                    if sequence.full_table_name and sequence.column_name:
+                        table = schema.tables.get(sequence.full_table_name)
+                        if table and sequence.column_name in table.columns:
+                            table.sequences.append(sequence)
             else:
                 logger.debug("Skipping unsupported statement: %s", text.splitlines()[0][:80])
 
@@ -124,6 +153,16 @@ class DDLParser:
                 next_token = result[1]
                 if next_token and next_token.match(T.Keyword, "TABLE"):
                     return StatementType.CREATE_TABLE
+                if next_token and next_token.match(T.Keyword, "INDEX"):
+                    return StatementType.CREATE_INDEX
+                if next_token and next_token.match(T.Keyword, "UNIQUE"):
+                    idx_result = statement.token_next(result[0], skip_cm=True, skip_ws=True)
+                    if idx_result and idx_result[1] and idx_result[1].match(T.Keyword, "INDEX"):
+                        return StatementType.CREATE_INDEX
+                if next_token and next_token.match(T.Keyword, "VIEW"):
+                    return StatementType.CREATE_VIEW
+                if next_token and next_token.match(T.Keyword, "SEQUENCE"):
+                    return StatementType.CREATE_SEQUENCE
 
         if first_token.match(T.Keyword.DDL, "ALTER") or first_token.match(T.Keyword, "ALTER"):
             result = statement.token_next(
@@ -151,7 +190,7 @@ class DDLParser:
             return None
 
         schema_name, table_name, full_name, token_index = identifier_result
-        table = Table(name=full_name, schema=schema_name)
+        table = Table(name=table_name, schema=schema_name)
 
         body = self._extract_table_body(statement)
         if body is None:
@@ -188,11 +227,11 @@ class DDLParser:
             logger.warning("Unable to parse ALTER TABLE statement: %s", statement.value[:80])
             return
 
-        schema_name, _, full_name, token_index = identifier_result
+        schema_name, table_name, full_name, token_index = identifier_result
         table = schema.tables.get(full_name)
         if not table:
             logger.info("Encountered ALTER TABLE for unknown %s; creating placeholder", full_name)
-            table = Table(name=full_name, schema=schema_name)
+            table = Table(name=table_name, schema=schema_name)
             schema.add_table(table)
 
         body = self._tokens_to_string(statement.tokens[token_index + 1 :]).strip()
@@ -385,7 +424,7 @@ class DDLParser:
                 on_delete, on_update = self._extract_fk_actions(" ".join(constraint_tokens))
                 fk = ForeignKey(
                     name=pending_name,
-                    source_table=table.name,
+                    source_table=table.full_name,
                     source_columns=[name],
                     target_table=target_full,
                     target_columns=target_columns,
@@ -460,7 +499,7 @@ class DDLParser:
             table.foreign_keys.append(
                 ForeignKey(
                     name=constraint_name,
-                    source_table=table.name,
+                    source_table=table.full_name,
                     source_columns=source_columns,
                     target_table=target_full,
                     target_columns=target_columns,
@@ -660,7 +699,7 @@ class DDLParser:
             return f"{default_schema}.{name}"
         return name
 
-    def _tokens_to_string(self, tokens: Sequence[sql_nodes.Token]) -> str:
+    def _tokens_to_string(self, tokens: TypingSequence[sql_nodes.Token]) -> str:
         """Collapse a sequence of sqlparse tokens back into raw text."""
         return "".join(token.value for token in tokens)
 
@@ -833,3 +872,214 @@ class DDLParser:
                 continue
             idx += 1
         return on_delete, on_update
+
+    def _parse_create_index(self, statement: sql_nodes.Statement) -> Optional[Index]:
+        """Parse a CREATE INDEX statement into an Index object."""
+        text = statement.value.strip()
+
+        is_unique = False
+        if text.upper().startswith("CREATE UNIQUE INDEX"):
+            is_unique = True
+
+        idx_name_result = self._identifier_after_keyword(statement, "INDEX")
+        if not idx_name_result:
+            logger.warning("Unable to find index name in statement: %s", text[:80])
+            return None
+
+        schema_name, index_name, full_index_name, _ = idx_name_result
+
+        on_pos = text.upper().find(" ON ")
+        if on_pos == -1:
+            logger.warning("Unable to find ON keyword for index %s", full_index_name)
+            return None
+
+        after_on = text[on_pos + 4 :].strip()
+
+        using_pos = after_on.upper().find(" USING ")
+        if using_pos != -1:
+            table_part = after_on[:using_pos].strip()
+        else:
+            table_part, _, _ = after_on.partition("(")
+            table_part = table_part.strip()
+
+        table_name = self._normalize_identifier(table_part)
+        schema = schema_name
+
+        index_type = "btree"
+        if "USING" in text.upper():
+            match = re.search(r"USING\s+(\w+)", text, re.IGNORECASE)
+            if match:
+                index_type = match.group(1).lower()
+
+        columns: List[str] = []
+        paren_start = text.find("(")
+        paren_end = text.rfind(")")
+        if paren_start != -1 and paren_end != -1 and paren_end > paren_start:
+            raw_columns = self._extract_identifier_list(text[paren_start : paren_end + 1])
+            columns = [col.split()[0] for col in raw_columns]
+
+        return Index(
+            name=full_index_name,
+            table_name=table_name,
+            schema=schema,
+            columns=columns,
+            is_unique=is_unique,
+            index_type=index_type,
+        )
+
+    def _parse_create_view(self, statement: sql_nodes.Statement) -> Optional[View]:
+        """Parse a CREATE VIEW statement into a View object."""
+        text = statement.value.strip()
+
+        view_name_result = self._identifier_after_keyword(statement, "VIEW")
+        if not view_name_result:
+            logger.warning("Unable to find view name in statement: %s", text[:80])
+            return None
+
+        schema_name, view_name, full_view_name, _ = view_name_result
+
+        full_name = f"{schema_name}.{view_name}" if schema_name else view_name
+
+        view_pos = text.upper().find(full_name.upper())
+        if view_pos == -1:
+            return None
+
+        after_name = text[view_pos + len(full_name) :]
+
+        definition = ""
+        select_match = re.search(r"^\s+AS\s+(SELECT\s+.+)", after_name, re.IGNORECASE | re.DOTALL)
+        if select_match:
+            definition = select_match.group(1).strip()
+
+        referenced_tables = self._extract_referenced_tables(definition)
+        columns = self._extract_select_columns(definition)
+
+        return View(
+            name=view_name,
+            schema=schema_name,
+            definition=definition,
+            columns=columns,
+            referenced_tables=referenced_tables,
+        )
+
+    def _extract_referenced_tables(self, definition: str) -> List[str]:
+        """Extract table names referenced in a SELECT statement."""
+        referenced: List[str] = []
+        pattern = r"(?:FROM|JOIN)\s+([\w\.]+)"
+        matches = re.findall(pattern, definition, re.IGNORECASE)
+        for match in matches:
+            normalized = self._normalize_identifier(match.strip())
+            if normalized:
+                referenced.append(normalized)
+        return referenced
+
+    def _extract_select_columns(self, definition: str) -> List[str]:
+        """Extract column names from a SELECT statement."""
+        columns: List[str] = []
+        select_match = re.search(r"SELECT\s+(.+?)\s+FROM", definition, re.IGNORECASE | re.DOTALL)
+        if not select_match:
+            return columns
+
+        select_part = select_match.group(1).strip()
+
+        if "*" in select_part:
+            return ["*"]
+
+        for col in select_part.split(","):
+            col = col.strip()
+
+            col = re.sub(r"\s+AS\s+\w+", "", col, flags=re.IGNORECASE)
+            col = re.sub(r"\s+as\s+\w+", "", col)
+
+            if "(" in col:
+                func_match = re.match(r"(\w+)\(.*\)", col)
+                if func_match:
+                    col = func_match.group(1)
+
+            col = col.strip()
+            if "." in col:
+                col = col.split(".")[-1]
+
+            if col:
+                columns.append(col)
+
+        return columns
+
+    def _parse_create_sequence(self, statement: sql_nodes.Statement) -> Optional[DbSequence]:
+        """Parse a CREATE SEQUENCE statement into a Sequence object."""
+        text = statement.value.strip()
+
+        seq_name_result = self._identifier_after_keyword(statement, "SEQUENCE")
+        if not seq_name_result:
+            logger.warning("Unable to find sequence name in statement: %s", text[:80])
+            return None
+
+        schema_name, seq_name, full_seq_name, _ = seq_name_result
+
+        start_value = 1
+        increment = 1
+        min_value = 1
+        max_value = 2147483647
+
+        if "START" in text.upper():
+            match = re.search(r"START\s+WITH\s+(\d+)", text, re.IGNORECASE)
+            if match:
+                start_value = int(match.group(1))
+
+        if "INCREMENT" in text.upper():
+            match = re.search(r"INCREMENT\s+BY\s+(\d+)", text, re.IGNORECASE)
+            if match:
+                increment = int(match.group(1))
+
+        if "MINVALUE" in text.upper():
+            match = re.search(r"MINVALUE\s+(\d+)", text, re.IGNORECASE)
+            if match:
+                min_value = int(match.group(1))
+
+        if "MAXVALUE" in text.upper():
+            match = re.search(r"MAXVALUE\s+(\d+)", text, re.IGNORECASE)
+            if match:
+                max_value = int(match.group(1))
+
+        table_name: Optional[str] = None
+        column_name: Optional[str] = None
+        schema: Optional[str] = schema_name
+
+        return DbSequence(
+            name=full_seq_name,
+            table_name=table_name,
+            column_name=column_name,
+            schema=schema,
+            start_value=start_value,
+            increment=increment,
+            min_value=min_value,
+            max_value=max_value,
+        )
+
+    def _detect_serial_columns(self, table: Table, schema: SchemaModel) -> None:
+        """Detect SERIAL/BIGSERIAL columns and create implicit sequences."""
+        for column in table.columns.values():
+            col_type_upper = column.data_type.upper()
+            if col_type_upper in ("SERIAL", "BIGSERIAL", "SMALLSERIAL"):
+                seq_name = f"{table.name}_{column.name}_seq"
+                increment = 1
+                start = 1
+                max_val = 2147483647
+
+                if col_type_upper == "BIGSERIAL":
+                    max_val = 9223372036854775807
+                elif col_type_upper == "SMALLSERIAL":
+                    max_val = 32767
+
+                seq = DbSequence(
+                    name=seq_name,
+                    table_name=table.name,
+                    schema=table.schema,
+                    column_name=column.name,
+                    start_value=start,
+                    increment=increment,
+                    min_value=1,
+                    max_value=max_val,
+                )
+                schema.add_sequence(seq)
+                table.sequences.append(seq)

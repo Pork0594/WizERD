@@ -33,6 +33,7 @@ class ThemeDimensions:
     table_min_width: float = 220.0
     table_max_width: float = 460.0
     table_side_padding: float = 28.0
+    marker_size: float = 10.0
 
 
 @dataclass
@@ -42,7 +43,6 @@ class ThemeEdgeStyling:
     edge_color: str = "#7dd3fc"
     edge_secondary: str = "#164e63"
     edge_width: float = 2.0
-    edge_trunk_width: float = 3.0
     edge_corner_radius: float = 20.0
     edge_color_palette: tuple[str, ...] = field(default_factory=lambda: tuple(EDGE_COLOR_PALETTE))
     arrow_marker_id: str = "fk-arrow"
@@ -62,6 +62,8 @@ class ThemeColors:
     zebra_row: str = "#101b2d"
     pk_marker: str = "#fbbf24"
     fk_marker: str = "#38bdf8"
+    idx_marker: str = "#a78bfa"
+    seq_marker: str = "#34d399"
 
 
 @dataclass
@@ -93,6 +95,8 @@ class Theme:
             zebra_row=self.colors.zebra_row,
             pk_marker=self.colors.pk_marker,
             fk_marker=self.colors.fk_marker,
+            idx_marker=self.colors.idx_marker,
+            seq_marker=self.colors.seq_marker,
             edge_color=self.edges.edge_color,
             edge_secondary=self.edges.edge_secondary,
             edge_color_palette=self.edges.edge_color_palette,
@@ -108,8 +112,9 @@ class Theme:
             row_height=self.dimensions.row_height,
             corner_radius=self.dimensions.corner_radius,
             table_stroke_width=self.dimensions.table_stroke_width,
+            table_side_padding=self.dimensions.table_side_padding,
+            marker_size=self.dimensions.marker_size,
             edge_width=self.edges.edge_width,
-            edge_trunk_width=self.edges.edge_trunk_width,
             edge_corner_radius=self.edges.edge_corner_radius,
         )
 
@@ -130,6 +135,8 @@ class Theme:
                 "zebra_row": self.colors.zebra_row,
                 "pk_marker": self.colors.pk_marker,
                 "fk_marker": self.colors.fk_marker,
+                "idx_marker": self.colors.idx_marker,
+                "seq_marker": self.colors.seq_marker,
             },
             "typography": {
                 "font_family": self.typography.font_family,
@@ -148,12 +155,12 @@ class Theme:
                 "table_min_width": self.dimensions.table_min_width,
                 "table_max_width": self.dimensions.table_max_width,
                 "table_side_padding": self.dimensions.table_side_padding,
+                "marker_size": self.dimensions.marker_size,
             },
             "edges": {
                 "edge_color": self.edges.edge_color,
                 "edge_secondary": self.edges.edge_secondary,
                 "edge_width": self.edges.edge_width,
-                "edge_trunk_width": self.edges.edge_trunk_width,
                 "edge_corner_radius": self.edges.edge_corner_radius,
                 "edge_color_palette": list(self.edges.edge_color_palette),
             },
@@ -176,6 +183,8 @@ class Theme:
             zebra_row=colors_data.get("zebra_row", ThemeColors().zebra_row),
             pk_marker=colors_data.get("pk_marker", ThemeColors().pk_marker),
             fk_marker=colors_data.get("fk_marker", ThemeColors().fk_marker),
+            idx_marker=colors_data.get("idx_marker", ThemeColors().idx_marker),
+            seq_marker=colors_data.get("seq_marker", ThemeColors().seq_marker),
         )
 
         typ_data = data.get("typography", {})
@@ -206,6 +215,7 @@ class Theme:
             table_side_padding=dim_data.get(
                 "table_side_padding", ThemeDimensions().table_side_padding
             ),
+            marker_size=dim_data.get("marker_size", ThemeDimensions().marker_size),
         )
 
         edge_data = data.get("edges", {})
@@ -213,7 +223,6 @@ class Theme:
             edge_color=edge_data.get("edge_color", ThemeEdgeStyling().edge_color),
             edge_secondary=edge_data.get("edge_secondary", ThemeEdgeStyling().edge_secondary),
             edge_width=edge_data.get("edge_width", ThemeEdgeStyling().edge_width),
-            edge_trunk_width=edge_data.get("edge_trunk_width", ThemeEdgeStyling().edge_trunk_width),
             edge_corner_radius=edge_data.get(
                 "edge_corner_radius", ThemeEdgeStyling().edge_corner_radius
             ),

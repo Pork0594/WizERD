@@ -35,3 +35,5 @@ dev/dumps/*
 
 # === Misc ===
 output/
+AGENTS.md
+.opencode

@@ -25,6 +25,8 @@ class RendererTheme:
     zebra_row: str = "#101b2d"
     pk_marker: str = "#fbbf24"
     fk_marker: str = "#38bdf8"
+    idx_marker: str = "#a78bfa"
+    seq_marker: str = "#34d399"
     edge_color: str = "#7dd3fc"
     edge_secondary: str = "#164e63"
     edge_color_palette: Tuple[str, ...] = tuple(EDGE_COLOR_PALETTE)
@@ -43,6 +45,6 @@ class RendererTheme:
     table_min_width: float = 220.0
     table_max_width: float = 460.0
     table_side_padding: float = 28.0
+    marker_size: float = 10.0
     edge_width: float = 2.0
-    edge_trunk_width: float = 3.0
     edge_corner_radius: float = 20.0

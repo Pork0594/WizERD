@@ -23,6 +23,9 @@ wizerd r <schema> [options]
 - `-l, --show-edge-labels` — Render FK names along connector lines
 - `-w, --spacing-profile [compact|standard|spacious]` — Spacing preset (default: standard)
 - `-e, --color-by-trunk` — Use unique color per FK target
+- `--indexes` — Include indexes in the diagram
+- `--views` — Include views as separate nodes in the diagram
+- `--sequences` — Include sequences for auto-increment columns in the diagram
 - `-t, --theme TEXT` — Built-in theme name
 - `-c, --config PATH` — Path to config file (YAML or JSON)
 

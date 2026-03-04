@@ -177,59 +177,9 @@ This makes it easier to trace relationships to specific tables.
 
 ## Custom Themes
 
-Define custom themes directly in your config file. The `theme` key accepts either a string (built-in theme name) or a full theme definition object.
+You can define custom themes or override specific theme variables directly in your config file. 
 
-### Using a Config File
-
-```yaml
-# .wizerd.yaml
-theme:
-  name: my-custom-theme
-  is_dark: true
-  colors:
-    canvas_background: "#1a1a2e"
-    table_background: "#16213e"
-    table_border: "#0f3460"
-    table_header_bg: "#0f3460"
-    table_header_text: "#e94560"
-    table_body_text: "#eaeaea"
-    table_secondary_text: "#a0a0a0"
-    zebra_row: "#1a1a2e"
-    pk_marker: "#ffd700"
-    fk_marker: "#00d4ff"
-  typography:
-    font_family: "'Inter', sans-serif"
-    font_size_header: 14
-    font_size_body: 12
-  dimensions:
-    header_height: 40
-    row_height: 28
-  edges:
-    edge_color: "#00d4ff"
-    edge_width: 2
-
-output: diagram.svg
-```
-
-Then generate:
-```bash
-wizerd generate schema.sql
-```
-
-### Using Theme Overrides
-
-Instead of a full theme, you can override specific values while keeping an existing theme as base:
-
-```yaml
-theme: default-dark
-theme-overrides:
-  colors:
-    canvas_background: "#1a1a2e"
-  typography:
-    font_size_header: 16.0
-```
-
-This lets you customize without defining everything.
+For a complete guide and reference to all available theme configuration properties, please see the [Theme Configuration](configuration.md#theme-configuration) section in the configuration documentation.
 
 ## Theme Selection Guide
 

@@ -107,6 +107,9 @@ class AppConfig:
         theme_overrides: Inline theme customization values.
         custom_spacing: Custom spacing values that override the profile.
         config_file: Path to the config file that was loaded (if any).
+        show_indexes: Whether to include indexes in the diagram.
+        show_views: Whether to include views as separate nodes.
+        show_sequences: Whether to include sequences for auto-increment columns.
     """
 
     input_path: Path
@@ -119,6 +122,9 @@ class AppConfig:
     theme_overrides: ThemeOverrides = field(default_factory=ThemeOverrides)
     custom_spacing: CustomSpacing | None = None
     config_file: Path | None = None
+    show_indexes: bool = False
+    show_views: bool = False
+    show_sequences: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         """Convert config to dictionary for serialization."""
@@ -130,6 +136,9 @@ class AppConfig:
             "edge_color_mode": self.edge_color_mode.value,
             "theme_name": self.theme_name,
             "config_file": str(self.config_file) if self.config_file else None,
+            "show_indexes": self.show_indexes,
+            "show_views": self.show_views,
+            "show_sequences": self.show_sequences,
         }
         if self.theme_inline is not None:
             result["theme_inline"] = self.theme_inline
@@ -174,6 +183,9 @@ class AppConfig:
             theme_overrides=theme_overrides,
             custom_spacing=custom_spacing,
             config_file=Path(data["config_file"]) if data.get("config_file") else None,
+            show_indexes=data.get("show_indexes", False),
+            show_views=data.get("show_views", False),
+            show_sequences=data.get("show_sequences", False),
         )
 
     @staticmethod
