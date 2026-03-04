@@ -189,7 +189,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PUSH_TOKEN }}
+          persist-credentials: false
 
       - name: Configure git
         run: |
@@ -212,13 +213,13 @@ jobs:
 
       - name: Run semantic-release version
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: semantic-release version
 
       - name: Run semantic-release publish
         id: semrel
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           semantic-release publish
           NEW_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "")
@@ -243,9 +244,9 @@ jobs:
 
       - name: Attach binaries to release
         if: steps.semrel.outputs.tag != ''
+        env:
+          GH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           for f in binaries/*; do
             gh release upload "${{ steps.semrel.outputs.tag }}" "$f" --clobber
           done
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
